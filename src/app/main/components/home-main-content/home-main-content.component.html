@@ -1,0 +1,54 @@
+<div class="main-content-home">
+  <div class="navigation">
+    <div class="justify-betwen">
+      <div class="btns">
+        <div>
+          <h3 class="blue-text">Recent pages</h3>
+        </div>
+      </div>
+      <div class="search-icon">
+        <div class="search">
+          <span class="material-symbols-outlined pointer"> search </span>
+        </div>
+      </div>
+    </div>
+    <div class="card-content-divs mb-5">
+      @for (item of cardItems; track $index) {
+      <div class="card-wrapper">
+        <mat-card routerLink="chat-main" class="pointer">
+          <mat-card-content>
+            <div class="main-card justify-betwen">
+              <div class="text-area">
+                <div>
+                  <p>{{ item.title }}</p>
+                </div>
+              </div>
+              <div class="right-content">
+                <div class="menu">
+                  <span
+                    class="material-symbols-outlined pointer"
+                    [matMenuTriggerFor]="menu"
+                  >
+                    more_vert
+                  </span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item class="align-center">
+          <span class="material-symbols-outlined"> border_color </span>
+          <span>Rename</span>
+        </button>
+
+        <button mat-menu-item class="align-center">
+          <span class="material-symbols-outlined"> delete </span>
+          <span>Delete</span>
+        </button>
+      </mat-menu>
+      }
+    </div>
+  </div>
+</div>

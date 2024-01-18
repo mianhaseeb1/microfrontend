@@ -1,0 +1,44 @@
+<app-nav-bar></app-nav-bar>
+<div class="main">
+  <div cdkDropList class="bookmark-list" (cdkDropListDropped)="drop($event)">
+    <div
+      *ngFor="let item of items$ | async; let i = index"
+      class="bookmark-item mt-5"
+      cdkDrag
+    >
+      <div>
+        <app-bookmark-input [item]="item"></app-bookmark-input>
+      </div>
+    </div>
+  </div>
+  <div
+    *ngFor="let notebook of notebooks$ | async; let i = index"
+    class="notebook-item mt-5"
+  >
+    <app-add-notes [notebook]="notebook"></app-add-notes>
+  </div>
+  <div class="btns-main">
+    <div class="btns">
+      <div class="web-bookmark-btn">
+        <button
+          mat-raised-button
+          matTooltip="Add Web Bookmarks"
+          matTooltipPosition="above"
+          (click)="addNewBookmark()"
+        >
+          <span class="material-symbols-outlined"> bookmark </span>
+        </button>
+      </div>
+      <div class="notes-btn">
+        <button
+          mat-raised-button
+          matTooltip="Add Notes"
+          matTooltipPosition="above"
+          (click)="addNewNotebook()"
+        >
+          <span class="material-symbols-outlined"> add_notes </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

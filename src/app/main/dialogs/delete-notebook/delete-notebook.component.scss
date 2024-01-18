@@ -1,0 +1,36 @@
+.main-delete {
+  padding: 24px;
+  .main-center {
+    text-align: center;
+    .icon {
+      span {
+        font-size: 24px;
+        padding-bottom: 10px;
+      }
+    }
+    .title {
+      p {
+        font-size: 24px;
+      }
+    }
+    .desc {
+      p {
+        margin-top: 30px;
+        margin-bottom: 0;
+        font-size: 14px;
+      }
+    }
+  }
+}
+.footer {
+  padding: 24px 24px 0 24px;
+  button {
+    height: 40px;
+    width: 89px;
+  }
+  .save-btn {
+    background-color: #cf2033 !important;
+    color: #ffffff;
+    border-radius: 20px;
+  }
+}

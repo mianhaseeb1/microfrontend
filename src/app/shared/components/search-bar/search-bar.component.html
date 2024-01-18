@@ -1,0 +1,79 @@
+<div class="search-div align-center justify-center mt-5" id="main-serach-div">
+  <div class="full-width">
+    <mat-form-field
+      id="search"
+      appearance="outline"
+      class="search justify-center"
+    >
+      <mat-label>Ask me anything...</mat-label>
+      <input
+        (click)="openAppsDropdown()"
+        matInput
+        placeholder="Ask me anything..."
+        [matAutocomplete]="auto"
+        [formControl]="searchControl"
+      />
+      <input type="file" #fileInput style="display: none" />
+      <div matSuffix class="search-icons">
+        <span
+          class="material-symbols-outlined pointer"
+          (click)="fileInput.click()"
+        >
+          attach_file
+        </span>
+        &nbsp;
+      </div>
+    </mat-form-field>
+    <mat-autocomplete #auto="matAutocomplete">
+      @if(appsDropdownOpened){
+      <div>
+        <button
+          class="autocomplete-buttons"
+          mat-button
+          *ngFor="let button of buttons"
+          [class.active]="isActiveButton(button)"
+          [ngStyle]="getButtonStyle(button)"
+          (click)="setActiveButton(button)"
+        >
+          @if(isActiveButton(button)){
+          <mat-icon> done </mat-icon>}
+          <span>{{ buttonText(button) }}</span> @if(button ==
+          'Data-banks'){<span class="material-symbols-outlined">
+            arrow_drop_down </span
+          >}
+        </button>
+      </div>
+      <mat-divider class="mt-2"></mat-divider>
+      @if(showDataBankOptions){
+      <div>
+        <mat-option
+          *ngFor="let option of dataBankOptions"
+          (click)="$event.stopPropagation()"
+        >
+          <mat-checkbox
+            color="primary"
+            (click)="$event.stopPropagation()"
+            [checked]="selectedDataBankOptions.includes(option)"
+            (change)="onCheckboxChange(option, $event.checked)"
+            >{{ option }}</mat-checkbox
+          >
+        </mat-option>
+      </div>
+      }
+      <mat-option disabled> <b>Sales Proposal Shortcuts</b> </mat-option>
+      } @for (option of filteredOptions | async; track $index) {
+      <mat-option [value]="option">
+        {{ option }}
+      </mat-option>
+      }
+    </mat-autocomplete>
+  </div>
+
+  <div class="send-div">
+    <div class="send">
+      <span class="material-symbols-outlined pointer" (click)="sendMessage()">
+        send
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+.main-login {
+  .header {
+    .logo {
+      img {
+        position: absolute;
+        top: 40px;
+        left: 40px;
+      }
+    }
+  }
+  .section {
+    display: flex;
+    height: 70vh;
+    align-items: center;
+    justify-content: center;
+    @media (max-width: 410px) {
+      height: 80vh;
+    }
+    .main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .welcome {
+        h1 {
+          font-size: 32px;
+          font-weight: 500;
+          @media (max-width: 410px) {
+            font-size: 26px;
+          }
+        }
+      }
+      .google-btn {
+        button {
+          border: 1px solid #d0d5dd;
+          padding: 10px 16px;
+        }
+      }
+    }
+  }
+  footer {
+    display: flex;
+    justify-content: center;
+    .main {
+      display: flex;
+      justify-content: center;
+      width: 454px;
+      align-items: center;
+      text-align: center;
+    }
+  }
+}

@@ -1,0 +1,110 @@
+<form [formGroup]="form">
+  <div class="flex-bookmark">
+    <div class="hover-icons">
+      <div class="main">
+        <div>
+          <span
+            class="material-symbols-outlined pointer"
+            (click)="enableEditMode()"
+          >
+            border_color
+          </span>
+        </div>
+        <div>
+          <span
+            class="material-symbols-outlined pointer"
+            (click)="delete(item.id)"
+          >
+            delete
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="wrapper" [ngClass]="{ 'active-wrapper': editMode }">
+      <div class="title">
+        <div class="form-group">
+          <div class="input-group">
+            @if(item){
+            <span
+              class="material-symbols-outlined align-center drag"
+              style="cursor: grab; opacity: 0.4"
+            >
+              drag_indicator
+            </span>
+            }
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Title"
+              formControlName="title"
+            />
+            <div class="input-group-append">
+              @if(titleValue != ''){
+              <span
+                class="input-group-text pointer material-icons"
+                (click)="titleValue = ''"
+              >
+                close
+              </span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="links">
+        <div formArrayName="links">
+          <div
+            *ngFor="
+              let linkFormGroup of links.controls;
+              let i = index;
+              let isLast = last
+            "
+            [formGroupName]="i"
+          >
+            <div class="input-group">
+              <span
+                class="input-group-text material-symbols-outlined left-span"
+                >{{ linkFormGroup.get("link")!.value ? "link" : "add" }}</span
+              >
+              <input
+                type="text"
+                class="form-control"
+                formControlName="link"
+                placeholder="Paste link here..."
+                (input)="onInput()"
+              />
+              @if(!item){ @if(i > 0){
+              <span
+                class="input-group-text material-symbols-outlined pointer right-span"
+                (click)="removeLink(i)"
+                >do_not_disturb_on</span
+              >} }
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="textarea">
+        <textarea
+          #textarea
+          placeholder="Add comments"
+          formControlName="comment"
+          (input)="adjustTextareaHeight($event)"
+          rows="1"
+        ></textarea>
+        @if(!item || editMode){
+        <div class="btn-div">
+          <button
+            (click)="onSubmit()"
+            mat-button
+            class="input-button"
+            [disabled]="!form.valid"
+          >
+            Done
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</form>
+<div *ngIf="editMode" class="dim-background" (click)="disableEditMode()"></div>

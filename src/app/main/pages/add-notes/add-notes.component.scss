@@ -1,0 +1,11 @@
+.main-notes {
+  display: flex;
+  justify-content: center;
+  .content {
+    box-shadow: 0 0 5px #9a9a9a;
+    padding: 20px;
+    width: 800px;
+    border-radius: 16px;
+    min-height: 195px;
+  }
+}

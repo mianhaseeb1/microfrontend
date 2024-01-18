@@ -1,0 +1,24 @@
+.search-div {
+  .send-div {
+    .send {
+      margin: 0 0 18px 18px;
+      span {
+        font-size: 30px;
+      }
+    }
+  }
+}
+.autocomplete-buttons {
+  border: 1px solid #b3b3b3;
+  border-radius: 8px;
+  padding: 6px 15px;
+  height: 32px;
+  margin-left: 6px;
+  font-weight: 500;
+}
+
+.autocomplete-buttons.active,
+button.mat-icon-button.custom-button.active {
+  background-color: #eef4ff;
+  color: #0d3074;
+}

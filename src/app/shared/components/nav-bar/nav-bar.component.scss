@@ -1,0 +1,73 @@
+.main-toolbar {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  left: 0;
+  mat-toolbar {
+    background: white;
+    box-shadow: 0 0 6px #ccc;
+    height: 53px !important;
+    .flex {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      .sales-proposal {
+        .header {
+          gap: 15px;
+          .header-txt {
+            p {
+              margin: 0;
+              font-size: 16px;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+      .title-res {
+        p {
+          font-weight: 500;
+          margin: 0;
+          font-size: 18px;
+        }
+      }
+      .profile-side {
+        display: flex;
+        gap: 25px;
+        align-items: center;
+        .shared-div {
+          button {
+            background: #1457d9;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            height: 30px;
+          }
+        }
+        .notf {
+          span {
+            font-size: 30px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.custom-input-group .form-control {
+  border: none;
+  box-shadow: none;
+  text-align: center;
+}
+
+.custom-input-group .input-group-text {
+  background: transparent;
+  border: none;
+}
+
+.custom-input-group .edit-icon {
+  visibility: hidden;
+}
+
+.custom-input-group:hover .edit-icon {
+  visibility: visible;
+}
