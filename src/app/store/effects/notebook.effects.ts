@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import * as NotebookActions from '../actions/notebook.actions';
-import { NotebookService } from '../services/notebook.service';
+import { NotebookService } from '../../services/notebook.service';
 
 @Injectable()
 export class NotebookEffects {

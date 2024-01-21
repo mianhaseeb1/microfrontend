@@ -1,7 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
-import { Bookmark } from '../models/bookmark.model';
+import { Bookmark } from '../../models/bookmark.model';
 import * as BookmarkActions from '../actions/bookmark.actions';
-import { BOOKMARK_DATA } from '../data/bookmark.data';
+import { BOOKMARK_DATA } from '../../data/bookmark.data';
 
 export interface BookmarkState {
   bookmarks: Bookmark[];

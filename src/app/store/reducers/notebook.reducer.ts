@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { Notebook } from '../models/notebook.model';
+import { Notebook } from '../../models/notebook.model';
 import * as NotebookActions from '../actions/notebook.actions';
 import { v4 as uuidv4 } from 'uuid';
 

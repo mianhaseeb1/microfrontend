@@ -22,7 +22,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MESSAGE } from '../../../utils/MESSAGES';
 import { DeleteNotebookComponent } from '../../dialogs/delete-notebook/delete-notebook.component';
 import { Store } from '@ngrx/store';
-import * as BookmarkActions from '../../../actions/bookmark.actions';
+import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({

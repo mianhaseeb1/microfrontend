@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { Notebook } from '../models/notebook.model';
+import { Notebook } from '../../models/notebook.model';
 
 export const addNotebook = createAction(
   '[Notebook] Add Notebook',
