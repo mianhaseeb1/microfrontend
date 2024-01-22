@@ -145,7 +145,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
 
   initializeForm(): void {
     this.form = this.fb.group({
-      title: ['', Validators.required],
+      title: [''],
       comment: [''],
       links: this.fb.array([this.createLink()]),
     });
