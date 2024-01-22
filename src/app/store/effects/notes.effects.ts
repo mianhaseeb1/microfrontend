@@ -2,19 +2,19 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
-import * as NotebookActions from '../actions/notebook.actions';
+import * as NotebookActions from '../actions/notes.actions';
 import { NotebookService } from '../../services/notebook.service';
 
 @Injectable()
 export class NotebookEffects {
   loadNotebooks$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(NotebookActions.loadNotebooks),
+      ofType(NotebookActions.loadNotes),
       mergeMap(() =>
         this.notebookService.notebooks.pipe(
-          map((notebooks) => NotebookActions.notebooksLoaded({ notebooks })),
+          map((notes) => NotebookActions.notesLoaded({ notes })),
           catchError((error) =>
-            of({ type: '[Notebook] Load Notebooks Failed', error })
+            of({ type: '[Notebook] Load Notes Failed', error })
           )
         )
       )
@@ -23,10 +23,10 @@ export class NotebookEffects {
 
   addNotebook$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(NotebookActions.addNotebook),
+      ofType(NotebookActions.addNotes),
       mergeMap((action) =>
-        of(this.notebookService.addNotebook(action.notebook)).pipe(
-          map((notebook) => NotebookActions.addEmptyNotebook({ notebook })),
+        of(this.notebookService.addNotebook(action.note)).pipe(
+          map((note) => NotebookActions.addEmptyNotes({ note })),
           catchError((error) =>
             of({ type: '[Notebook] Add Notebook Failed', error })
           )
@@ -37,9 +37,9 @@ export class NotebookEffects {
 
   updateNotebook$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(NotebookActions.updateNotebook),
-      tap((action) => this.notebookService.updateNotebook(action.notebook)),
-      map(() => NotebookActions.loadNotebooks()),
+      ofType(NotebookActions.updateNotes),
+      tap((action) => this.notebookService.updateNotebook(action.note)),
+      map(() => NotebookActions.loadNotes()),
       catchError((error) =>
         of({ type: '[Notebook] Update Notebook Failed', error })
       )
@@ -48,9 +48,9 @@ export class NotebookEffects {
 
   deleteNotebook$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(NotebookActions.deleteNotebook),
+      ofType(NotebookActions.deleteNotes),
       tap((action) => this.notebookService.deleteNotebook(action.id)),
-      map(() => NotebookActions.loadNotebooks()),
+      map(() => NotebookActions.loadNotes()),
       catchError((error) =>
         of({ type: '[Notebook] Delete Notebook Failed', error })
       )

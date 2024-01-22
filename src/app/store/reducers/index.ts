@@ -7,18 +7,18 @@ import {
   MetaReducer,
 } from '@ngrx/store';
 import { bookmarkReducer, BookmarkState } from './bookmark.reducer';
-import { notebookReducer, NotebookState } from './notebook.reducer';
+import { notesReducer, Notestate } from './notes.reducer';
 import { authReducer, AuthState } from './auth.reducer';
 
 export interface State {
   bookmarks: BookmarkState;
-  notebooks: NotebookState;
+  notes: Notestate;
   auth: AuthState;
 }
 
 export const reducers: ActionReducerMap<State> = {
   bookmarks: bookmarkReducer,
-  notebooks: notebookReducer,
+  notes: notesReducer,
   auth: authReducer,
 };
 

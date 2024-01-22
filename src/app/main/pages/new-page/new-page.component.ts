@@ -17,10 +17,10 @@ import InlineEditor from '@ckeditor/ckeditor5-build-inline';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { Observable, Subject, map, take, takeUntil } from 'rxjs';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
-import * as NotebookActions from '../../../store/actions/notebook.actions';
+import * as NotebookActions from '../../../store/actions/notes.actions';
 import { Store } from '@ngrx/store';
 import * as fromBookmark from '../../../store/selectors/bookmark.selectors';
-import * as fromNotebook from '../../../store/selectors/notebook.selectors';
+import * as fromNotebook from '../../../store/selectors/notes.selectors';
 import { v4 as uuidv4 } from 'uuid';
 import { Notebook } from '../../../models/notebook.model';
 import { NotebookService } from '../../../services/notebook.service';
@@ -62,7 +62,7 @@ export class NewPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.store.dispatch(BookmarkActions.loadBookmarks());
     this.items$ = this.store.select(fromBookmark.selectAllBookmarks);
-    this.store.dispatch(NotebookActions.loadNotebooks());
+    this.store.dispatch(NotebookActions.loadNotes());
     this.notebooks$ = this.store.select(fromNotebook.selectAllNotebooks);
 
     this.editorContents = this.editorService.getEditorContents();
@@ -117,7 +117,7 @@ export class NewPageComponent implements OnInit, OnDestroy {
       id: '',
       content: '',
     };
-    this.store.dispatch(NotebookActions.addNotebook({ notebook: newNotebook }));
+    this.store.dispatch(NotebookActions.addNotes({ note: newNotebook }));
   }
 
   onBookmarkAdded(newBookmarkId: string) {

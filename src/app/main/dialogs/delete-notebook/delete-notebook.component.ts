@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MESSAGE } from '../../../utils/MESSAGES';
 import { Store } from '@ngrx/store';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
+import * as NotesAction from '../../../store/actions/notes.actions';
 
 @Component({
   selector: 'app-delete-notebook',
@@ -25,6 +26,11 @@ export class DeleteNotebookComponent {
 
   delete() {
     const id = this.data.id;
-    this.store.dispatch(BookmarkActions.deleteBookmark({ id }));
+    const type = this.data.type;
+    if (type == 'bookmark') {
+      this.store.dispatch(BookmarkActions.deleteBookmark({ id }));
+    } else {
+      this.store.dispatch(NotesAction.deleteNotes({ id }));
+    }
   }
 }

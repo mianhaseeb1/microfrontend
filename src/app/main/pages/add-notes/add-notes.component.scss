@@ -9,3 +9,34 @@
     min-height: 195px;
   }
 }
+
+.flex-notes {
+  display: flex;
+  gap: 20px;
+  position: relative;
+  width: 900px;
+  justify-content: center;
+  &:hover .hover-icons {
+    display: block;
+  }
+  .hover-icons {
+    display: none;
+    transition: all 0.5s;
+    position: absolute;
+    left: 0;
+    top: 0;
+    .main {
+      box-shadow: 0 0 5px #8d8d8d;
+      border-radius: 25px;
+      padding: 11px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      span {
+        color: #1457d9;
+        font-size: 21px;
+      }
+    }
+  }
+}
