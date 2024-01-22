@@ -145,12 +145,11 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
 
   initializeForm(): void {
     this.form = this.fb.group({
-      title: ['', Validators.required],
+      title: [''],
       comment: [''],
       links: this.fb.array([this.createLink()]),
     });
   }
-
   private generateUniqueId(): string {
     return uuidv4();
   }
@@ -165,7 +164,10 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     const updatedBookmark: Bookmark = {
       ...this.item,
       title: this.form.controls['title'].value,
+      comment: this.form.controls['comment'].value,
+      editMode: false,
     };
+
     this.store.dispatch(
       BookmarkActions.updateBookmark({ bookmark: updatedBookmark })
     );
