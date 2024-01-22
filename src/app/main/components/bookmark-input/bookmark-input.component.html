@@ -54,7 +54,7 @@
         <textarea #textarea placeholder="Add comments" formControlName="comment" (input)="adjustTextareaHeight($event)" rows="1"></textarea>
         @if(!item || editMode){
         <div class="btn-div">
-          <button (click)="onSubmit()" mat-button class="input-button" [disabled]="!form.valid">
+          <button (click)="onSubmit()" mat-button class="input-button">
             Done
           </button>
         </div>
