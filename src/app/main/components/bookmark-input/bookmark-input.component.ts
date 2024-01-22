@@ -133,8 +133,8 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
 
     this._snackBar.open(
       isNewBookmark
-        ? 'Bookmark added successfully'
-        : 'Bookmark updated successfully'
+        ? MESSAGE.successfully_added_bookmark
+        : MESSAGE.successfully_updated_bookmark
     );
   }
 
@@ -145,12 +145,11 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
 
   initializeForm(): void {
     this.form = this.fb.group({
-      title: ['', Validators.required],
+      title: [''],
       comment: [''],
       links: this.fb.array([this.createLink()]),
     });
   }
-
   private generateUniqueId(): string {
     return uuidv4();
   }
@@ -161,14 +160,27 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   }
 
   disableEditMode(): void {
-    this.editMode = false;
+    const formValue = this.form.value;
+    const linkInputs = formValue.links || [];
+
+    const linkStrings = linkInputs
+      .map((linkObj: { link: string }) => linkObj.link.trim())
+      .filter((link: string) => link !== '');
+
     const updatedBookmark: Bookmark = {
       ...this.item,
-      title: this.form.controls['title'].value,
+      title: formValue.title || '',
+      comment: formValue.comment || '',
+      links: linkStrings,
+      editMode: false,
     };
+
     this.store.dispatch(
       BookmarkActions.updateBookmark({ bookmark: updatedBookmark })
     );
+    this._snackBar.open(MESSAGE.successfully_updated_bookmark);
+
+    this.editMode = false;
     this.cdr.detectChanges();
   }
 
