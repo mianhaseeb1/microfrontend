@@ -6,7 +6,7 @@ import { BookmarkService } from '../../../services/bookmark.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MESSAGE } from '../../../utils/MESSAGES';
 import { Store } from '@ngrx/store';
-import * as BookmarkActions from '../../../actions/bookmark.actions';
+import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 
 @Component({
   selector: 'app-delete-notebook',

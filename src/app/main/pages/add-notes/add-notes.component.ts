@@ -7,7 +7,7 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { EditorService } from '../../../services/ckeditor.service';
 import { Notebook } from '../../../models/notebook.model';
 import { Store } from '@ngrx/store';
-import * as NotebookActions from '../../../actions/notebook.actions';
+import * as NotebookActions from '../../../store/actions/notebook.actions';
 import { Subject, debounceTime } from 'rxjs';
 @Component({
   selector: 'app-add-notes',
