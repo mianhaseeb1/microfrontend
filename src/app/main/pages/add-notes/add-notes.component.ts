@@ -7,8 +7,10 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { EditorService } from '../../../services/ckeditor.service';
 import { Notebook } from '../../../models/notebook.model';
 import { Store } from '@ngrx/store';
-import * as NotebookActions from '../../../store/actions/notebook.actions';
+import * as NotebookActions from '../../../store/actions/notes.actions';
 import { Subject, debounceTime } from 'rxjs';
+import { DeleteNotebookComponent } from '../../dialogs/delete-notebook/delete-notebook.component';
+import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-add-notes',
   standalone: true,
@@ -25,7 +27,11 @@ export class AddNotesComponent {
   @Input() notebook!: Notebook;
   private contentChange = new Subject<string>();
 
-  constructor(private editorService: EditorService, private store: Store) {
+  constructor(
+    private editorService: EditorService,
+    private store: Store,
+    public dialog: MatDialog
+  ) {
     this.contentChange.pipe(debounceTime(1000)).subscribe((content) => {
       this.saveNotebookContent(content);
     });
@@ -67,14 +73,24 @@ export class AddNotesComponent {
 
   private saveNotebookContent(content: string) {
     const updatedNotebook = { ...this.notebook, content };
-    this.store.dispatch(
-      NotebookActions.updateNotebook({ notebook: updatedNotebook })
-    );
+    this.store.dispatch(NotebookActions.updateNotes({ note: updatedNotebook }));
   }
 
   editorHasContent(): boolean {
     const content = this.editorInstance.getData();
     return content.trim() !== '';
+  }
+
+  delete(id: string, type: string) {
+    this.dialog.open(DeleteNotebookComponent, {
+      panelClass: 'custom-container',
+      width: '312px',
+      height: '260px',
+      data: {
+        id: id,
+        type: type,
+      },
+    });
   }
 
   save() {

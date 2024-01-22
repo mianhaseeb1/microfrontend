@@ -210,13 +210,14 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     }
   }
 
-  delete(id: string) {
+  delete(id: string, type: string) {
     this.dialog.open(DeleteNotebookComponent, {
       panelClass: 'custom-container',
       width: '312px',
       height: '260px',
       data: {
         id: id,
+        type: type,
       },
     });
   }
