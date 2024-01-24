@@ -11,6 +11,7 @@ import * as NotebookActions from '../../../store/actions/notes.actions';
 import { Subject, debounceTime } from 'rxjs';
 import { DeleteNotebookComponent } from '../../dialogs/delete-notebook/delete-notebook.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-add-notes',
   standalone: true,
@@ -26,11 +27,13 @@ export class AddNotesComponent {
   public editorInstance: any;
   @Input() notebook!: Notebook;
   private contentChange = new Subject<string>();
+  lastDeletedNote: Notebook | null = null;
 
   constructor(
     private editorService: EditorService,
     private store: Store,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private _snackBar: MatSnackBar
   ) {
     this.contentChange.pipe(debounceTime(1000)).subscribe((content) => {
       this.saveNotebookContent(content);
@@ -81,15 +84,28 @@ export class AddNotesComponent {
     return content.trim() !== '';
   }
 
-  delete(id: string, type: string) {
-    this.dialog.open(DeleteNotebookComponent, {
-      panelClass: 'custom-container',
-      width: '312px',
-      height: '260px',
-      data: {
-        id: id,
-        type: type,
-      },
+  delete(id: string) {
+    this.lastDeletedNote = this.notebook;
+    this.store.dispatch(NotebookActions.deleteNotes({ id }));
+    this.showUndoSnackbar();
+  }
+
+  private showUndoSnackbar() {
+    const snackBarRef = this._snackBar.open('Note deleted', 'UNDO', {
+      duration: 5000,
+    });
+
+    snackBarRef.onAction().subscribe(() => {
+      if (this.lastDeletedNote) {
+        this.store.dispatch(
+          NotebookActions.addNotes({ note: this.lastDeletedNote })
+        );
+        this.lastDeletedNote = null;
+      }
+    });
+
+    snackBarRef.afterDismissed().subscribe(() => {
+      this.lastDeletedNote = null;
     });
   }
 
