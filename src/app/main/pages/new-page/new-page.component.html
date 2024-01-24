@@ -7,7 +7,7 @@
       </div>
     </div>
   </div>
-  <div *ngFor="let notebook of notebooks$ | async; let i = index" class="notebook-item mt-4">
+  <div *ngFor="let notebook of notebooks$ | async; let i = index" class="notebook-item">
     <app-add-notes [notebook]="notebook"></app-add-notes>
   </div>
   <div class="btns-main">

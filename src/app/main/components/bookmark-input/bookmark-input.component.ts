@@ -38,6 +38,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   inputValue: string = '';
   editMode: boolean = false;
   addingNewBookmark: boolean = false;
+  lastDeletedItem: Bookmark | null = null;
   form = this.fb.group({
     title: ['', Validators.required],
     comment: [''],
@@ -222,15 +223,28 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     }
   }
 
-  delete(id: string, type: string) {
-    this.dialog.open(DeleteNotebookComponent, {
-      panelClass: 'custom-container',
-      width: '312px',
-      height: '260px',
-      data: {
-        id: id,
-        type: type,
-      },
+  delete(id: string) {
+    this.lastDeletedItem = this.item;
+    this.store.dispatch(BookmarkActions.deleteBookmark({ id }));
+    this.showUndoSnackbar();
+  }
+
+  private showUndoSnackbar() {
+    const snackBarRef = this._snackBar.open('Bookmark deleted', 'UNDO', {
+      duration: 5000,
+    });
+
+    snackBarRef.onAction().subscribe(() => {
+      if (this.lastDeletedItem) {
+        this.store.dispatch(
+          BookmarkActions.addBookmark({ bookmark: this.lastDeletedItem })
+        );
+        this.lastDeletedItem = null;
+      }
+    });
+
+    snackBarRef.afterDismissed().subscribe(() => {
+      this.lastDeletedItem = null;
     });
   }
 }
