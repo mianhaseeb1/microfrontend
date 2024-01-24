@@ -43,9 +43,12 @@
             " [formGroupName]="i">
             <div class="input-group">
               <span class="input-group-text material-symbols-outlined left-span">{{ linkFormGroup.get("link")!.value ? "link" : "add" }}</span>
-              <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput()" />
-              @if(i > 0 && editMode){
-              <span class="input-group-text material-symbols-outlined pointer right-span" (click)="removeLink(i)">do_not_disturb_on</span>}
+              <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)" />
+              @if(editMode){
+              <span class="input-group-text material-symbols-outlined pointer right-span remove-icon"
+                *ngIf="links.length > 1 && !(isLast && linkFormGroup.get('link')!.value.trim() === '')" (click)="removeLink(i)">
+                do_not_disturb_on
+              </span>}
             </div>
           </div>
         </div>

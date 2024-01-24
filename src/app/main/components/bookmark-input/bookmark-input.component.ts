@@ -213,13 +213,32 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   }
 
   removeLink(index: number): void {
-    this.links.removeAt(index);
+    if (
+      this.links.length > 1 &&
+      !(
+        index === this.links.length - 1 &&
+        this.links.at(index).value.link.trim() === ''
+      )
+    ) {
+      this.links.removeAt(index);
+    }
   }
 
-  onInput(): void {
-    const lastInput = this.links.at(this.links.length - 1).value.link;
-    if (lastInput && this.links.length === this.links.controls.length) {
+  onInput(index: number): void {
+    const currentInput = this.links.at(index).value.link;
+    const isLastInput = index === this.links.length - 1;
+
+    if (isLastInput && currentInput.trim() !== '') {
       this.addLink();
+    } else if (!isLastInput && currentInput.trim() === '') {
+      const nextInput = this.links.at(index + 1);
+      if (
+        nextInput &&
+        nextInput.value.link.trim() !== '' &&
+        this.links.length > 2
+      ) {
+        this.removeLink(index);
+      }
     }
   }
 
