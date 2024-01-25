@@ -25,6 +25,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { Notebook } from '../../../models/notebook.model';
 import { NotebookService } from '../../../services/notebook.service';
 import { AddNotesComponent } from '../add-notes/add-notes.component';
+import * as fromChatReducer from '../../../store/reducers/chat.reducer';
+import * as ChatActions from '../../../store/actions/chat.actions';
+import * as ChatSelectors from '../../../store/selectors/chat.selectors';
+import { ChatSession } from '../../../store/reducers/chat.reducer';
 @Component({
   selector: 'app-new-page',
   standalone: true,
@@ -51,11 +55,16 @@ export class NewPageComponent implements OnInit, OnDestroy {
   addingNewBookmark: boolean = false;
   notebooks: Notebook[] = [];
   notebooks$!: Observable<Notebook[]>;
+  showInput: boolean = false;
+  //messages$!: Observable<fromChatReducer.ChatState['messages']>;
+  currentSessionId: string = '';
+  chatSessions$!: Observable<ChatSession[]>;
+  currentSessionMessages$!: Observable<fromChatReducer.ChatMessage[]>;
 
   constructor(
     private bookmarkService: BookmarkService,
     private editorService: EditorService,
-    private store: Store,
+    public store: Store,
     private notebookService: NotebookService
   ) {}
 
@@ -64,6 +73,13 @@ export class NewPageComponent implements OnInit, OnDestroy {
     this.items$ = this.store.select(fromBookmark.selectAllBookmarks);
     this.store.dispatch(NotebookActions.loadNotes());
     this.notebooks$ = this.store.select(fromNotebook.selectAllNotebooks);
+    //this.messages$ = this.store.select(ChatSelectors.selectMessages);
+    this.chatSessions$ = this.store.select(ChatSelectors.selectChatSessions);
+    this.chatSessions$ = this.store.select(ChatSelectors.selectChatSessions);
+
+    this.currentSessionMessages$ = this.store.select(
+      ChatSelectors.selectMessagesFromSession(this.currentSessionId)
+    );
 
     this.editorContents = this.editorService.getEditorContents();
     this.bookmarkService.onBookmarkDeleted
@@ -99,6 +115,40 @@ export class NewPageComponent implements OnInit, OnDestroy {
     this.store.dispatch(BookmarkActions.loadBookmarks());
   }
 
+  toggleChat() {
+    this.showInput = !this.showInput;
+    if (this.showInput) {
+      this.startNewChatSession();
+      this.store
+        .select(ChatSelectors.selectCurrentSessionId)
+        .pipe(take(1))
+        .subscribe((sessionId) => {
+          if (sessionId !== undefined) {
+            this.currentSessionId = sessionId;
+          }
+        });
+      setTimeout(() => {
+        document
+          .querySelector('.chat-input mat-form-field')!
+          .classList.add('active');
+        document.querySelector('.btns')!.classList.add('hidden');
+      }, 10);
+    } else {
+      document
+        .querySelector('.chat-input mat-form-field')!
+        .classList.remove('active');
+      document.querySelector('.btns')!.classList.remove('hidden');
+    }
+  }
+
+  startNewChatSession() {
+    const newSessionId = uuidv4();
+    this.store.dispatch(
+      ChatActions.startNewSession({ sessionId: newSessionId })
+    );
+    this.currentSessionId = newSessionId;
+  }
+
   addNewBookmark(): void {
     this.addingNewBookmark = true;
     const newBookmark: Bookmark = {
@@ -110,6 +160,17 @@ export class NewPageComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(BookmarkActions.addBookmark({ bookmark: newBookmark }));
     this.onBookmarkAdded(newBookmark.id);
+  }
+
+  onSendMessage(content: string) {
+    if (content.trim() !== '' && this.currentSessionId) {
+      this.store.dispatch(
+        ChatActions.sendMessage({
+          sessionId: this.currentSessionId,
+          message: content,
+        })
+      );
+    }
   }
 
   addNewNotebook(): void {
