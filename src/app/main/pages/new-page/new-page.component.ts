@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Bookmark } from '../../../models/bookmark.model';
 import {
   CdkDragDrop,
@@ -60,6 +60,7 @@ export class NewPageComponent implements OnInit, OnDestroy {
   currentSessionId: string = '';
   chatSessions$!: Observable<ChatSession[]>;
   currentSessionMessages$!: Observable<fromChatReducer.ChatMessage[]>;
+  showScrollToTopButton: boolean = false;
 
   constructor(
     private bookmarkService: BookmarkService,
@@ -198,5 +199,36 @@ export class NewPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }
+
+  scrollToBottom() {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: 'smooth',
+    });
+  }
+
+  @HostListener('window:scroll', ['$event'])
+  onWindowScroll() {
+    const scrollTop =
+      window.pageYOffset ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+
+    if (scrollTop > (documentHeight - windowHeight) / 2) {
+      this.showScrollToTopButton = true;
+    } else {
+      this.showScrollToTopButton = false;
+    }
   }
 }

@@ -65,3 +65,11 @@
     </button>
   </mat-form-field>
 </div>
+
+<button *ngIf="!showScrollToTopButton" mat-fab color="primary" class="scroll-btn bottom" (click)="scrollToBottom()">
+  <mat-icon>arrow_downward</mat-icon>
+</button>
+
+<button *ngIf="showScrollToTopButton" mat-fab color="primary" class="scroll-btn top" (click)="scrollToTop()">
+  <mat-icon>arrow_upward</mat-icon>
+</button>

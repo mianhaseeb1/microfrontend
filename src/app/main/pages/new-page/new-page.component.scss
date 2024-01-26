@@ -142,3 +142,22 @@
     }
   }
 }
+
+.scroll-btn {
+  position: fixed;
+  left: 20px;
+  z-index: 1000;
+  opacity: 0.6;
+  transition: all 0.5s;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.scroll-btn.top {
+  bottom: 20px;
+}
+
+.scroll-btn.bottom {
+  bottom: 20px;
+}
