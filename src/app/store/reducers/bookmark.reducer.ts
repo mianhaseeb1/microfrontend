@@ -1,7 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { Bookmark } from '../../models/bookmark.model';
 import * as BookmarkActions from '../actions/bookmark.actions';
-import { BOOKMARK_DATA } from '../../data/bookmark.data';
 
 export interface BookmarkState {
   bookmarks: Bookmark[];
@@ -9,7 +8,7 @@ export interface BookmarkState {
 }
 
 export const initialState: BookmarkState = {
-  bookmarks: BOOKMARK_DATA,
+  bookmarks: [],
   isAddingNewBookmark: false,
 };
 

@@ -1,16 +1,50 @@
 <app-nav-bar></app-nav-bar>
-<div class="main">
+<div class="main" #mainContainer>
   <div cdkDropList class="bookmark-list" (cdkDropListDropped)="drop($event)">
     <div *ngFor="let item of items$ | async; let i = index" class="bookmark-item mt-4" cdkDrag>
       <div>
-        <app-bookmark-input [item]="item"></app-bookmark-input>
+        <app-bookmark-input [item]="item" (scrollRequest)="scrollMainContainerToBottom()"></app-bookmark-input>
       </div>
     </div>
   </div>
   <div *ngFor="let notebook of notebooks$ | async; let i = index" class="notebook-item">
     <app-add-notes [notebook]="notebook"></app-add-notes>
   </div>
-  <div class="btns-main">
+  <div *ngFor="let chatSession of chatSessions$ | async; let sessionIndex = index" class="chat-session">
+    <div class="messages mt-3">
+      <div class="title-message">
+        <small>{{chatSession.id}}</small>
+        <hr>
+      </div>
+      <div class="flex-messages">
+        <div *ngFor="let message of chatSession.messages"
+          [ngClass]="{'user-message': message.sender === 'user', 'bot-message': message.sender === 'bot'}">
+
+          <div class="align-center">
+            <div>
+              <img *ngIf="message.sender === 'bot'" src="/assets/images/bot.png" width="30px" class="avatar" alt="Bot">&nbsp;&nbsp;
+            </div>
+            <div class="main-ch">
+              <p>{{ message.content }}</p>
+            </div>
+            <div>
+              &nbsp;&nbsp;<img *ngIf="message.sender === 'user'" src="/assets/images/Avatar.png" width="30px" class="avatar" alt="User">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="btns-main justify-betwen">
+    <div class="scroll">
+      <button *ngIf="!showScrollToTopButton" mat-fab color="primary" class="scroll-btn bottom" (click)="scrollToBottom()">
+        <mat-icon>arrow_downward</mat-icon>
+      </button>
+
+      <button *ngIf="showScrollToTopButton" mat-fab color="primary" class="scroll-btn top" (click)="scrollToTop()">
+        <mat-icon>arrow_upward</mat-icon>
+      </button>
+    </div>
     <div class="btns">
       <div class="web-bookmark-btn">
         <button mat-raised-button matTooltip="Add Web Bookmarks" matTooltipPosition="above" (click)="addNewBookmark()">
@@ -23,5 +57,19 @@
         </button>
       </div>
     </div>
+    <div class="chat-btn" *ngIf="!showInput">
+      <button mat-raised-button matTooltip="New Chat" matTooltipPosition="left" (click)="toggleChat()" id="new-chat">
+        <span class="material-symbols-outlined"> chat </span>
+      </button>
+    </div>
   </div>
+</div>
+<div *ngIf="showInput" class="chat-input">
+  <mat-form-field appearance="outline" class="example-full-width">
+    <mat-label>Type a message</mat-label>
+    <input matInput #chatInput (keyup.enter)="onSendMessage(chatInput.value); chatInput.value=''">
+    <button mat-icon-button matTooltip="Close" (click)="toggleChat()" matSuffix>
+      <span class="material-symbols-outlined"> close </span>
+    </button>
+  </mat-form-field>
 </div>

@@ -1,17 +1,46 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { tap } from 'rxjs/operators';
+import { catchError, exhaustMap, map, mergeMap, tap } from 'rxjs/operators';
 import * as AuthActions from '../actions/auth.actions';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { of } from 'rxjs';
 
 @Injectable()
 export class AuthEffects {
-  login$ = createEffect(
+  login$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.login),
+      exhaustMap(() =>
+        this.authService.login().pipe(
+          tap((response: any) => {
+            window.location.href = response.data;
+          }),
+          map(() => AuthActions.loginDummy()),
+          catchError((error) => of(AuthActions.loginFailure({ error })))
+        )
+      )
+    )
+  );
+
+  handleAuthCallback$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.handleAuthCallback),
+      mergeMap((action) =>
+        this.authService.handleAuthCallback(action.code).pipe(
+          map((user) => AuthActions.loginSuccess({ user })),
+          catchError((error) => of(AuthActions.loginFailure({ error })))
+        )
+      )
+    )
+  );
+
+  loginRedirect$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AuthActions.login),
+        ofType(AuthActions.loginSuccess),
         tap(() => {
-          localStorage.setItem('auth', 'google authentication successful');
+          localStorage.setItem('auth', 'authentication successful');
           this.router.navigate(['/home']);
         })
       ),
@@ -30,5 +59,9 @@ export class AuthEffects {
     { dispatch: false }
   );
 
-  constructor(private actions$: Actions, private router: Router) {}
+  constructor(
+    private actions$: Actions,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 }

@@ -11,11 +11,14 @@ import * as AuthActions from '../../../store/actions/auth.actions';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-  constructor(private store: Store, private router: Router) {}
+  constructor(private store: Store) {}
 
   login() {
     this.store.dispatch(AuthActions.login());
-    this.router.navigate(['/home']);
+  }
+
+  handleAuthCallback(code: string) {
+    this.store.dispatch(AuthActions.handleAuthCallback({ code }));
   }
 
   logout() {
