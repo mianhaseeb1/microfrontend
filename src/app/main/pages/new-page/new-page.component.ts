@@ -1,4 +1,11 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Bookmark } from '../../../models/bookmark.model';
 import {
   CdkDragDrop,
@@ -56,6 +63,7 @@ export class NewPageComponent implements OnInit, OnDestroy {
   notebooks: Notebook[] = [];
   notebooks$!: Observable<Notebook[]>;
   showInput: boolean = false;
+  @ViewChild('mainContainer') private mainContainer!: ElementRef;
   //messages$!: Observable<fromChatReducer.ChatState['messages']>;
   currentSessionId: string = '';
   chatSessions$!: Observable<ChatSession[]>;
@@ -70,6 +78,7 @@ export class NewPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.scrollMainContainerToBottom();
     this.store.dispatch(BookmarkActions.loadBookmarks());
     this.items$ = this.store.select(fromBookmark.selectAllBookmarks);
     this.store.dispatch(NotebookActions.loadNotes());
@@ -88,6 +97,13 @@ export class NewPageComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.refreshBookmarks();
       });
+  }
+
+  scrollMainContainerToBottom(): void {
+    setTimeout(() => {
+      const scrollContainer = this.mainContainer.nativeElement;
+      scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }, 100);
   }
 
   drop(event: CdkDragDrop<Bookmark[]>): void {
@@ -143,6 +159,7 @@ export class NewPageComponent implements OnInit, OnDestroy {
   }
 
   startNewChatSession() {
+    this.scrollMainContainerToBottom();
     const newSessionId = uuidv4();
     this.store.dispatch(
       ChatActions.startNewSession({ sessionId: newSessionId })
@@ -151,6 +168,7 @@ export class NewPageComponent implements OnInit, OnDestroy {
   }
 
   addNewBookmark(): void {
+    this.scrollMainContainerToBottom();
     this.addingNewBookmark = true;
     const newBookmark: Bookmark = {
       id: this.generateUniqueId(),
@@ -164,7 +182,18 @@ export class NewPageComponent implements OnInit, OnDestroy {
   }
 
   onSendMessage(content: string) {
-    if (content.trim() !== '' && this.currentSessionId) {
+    if (content.trim() !== '') {
+      if (
+        !this.currentSessionId ||
+        this.isSessionEnded(this.currentSessionId)
+      ) {
+        const newSessionId = uuidv4();
+        this.store.dispatch(
+          ChatActions.startNewSession({ sessionId: newSessionId })
+        );
+        this.currentSessionId = newSessionId;
+      }
+
       this.store.dispatch(
         ChatActions.sendMessage({
           sessionId: this.currentSessionId,
@@ -174,7 +203,19 @@ export class NewPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  isSessionEnded(sessionId: string): boolean {
+    let isEnded = false;
+    this.store
+      .select(ChatSelectors.selectChatSessionById(sessionId))
+      .pipe(take(1))
+      .subscribe((session) => {
+        isEnded = session ? session.ended : true;
+      });
+    return isEnded;
+  }
+
   addNewNotebook(): void {
+    this.scrollMainContainerToBottom();
     const newNotebook: Notebook = {
       id: '',
       content: '',
@@ -183,6 +224,7 @@ export class NewPageComponent implements OnInit, OnDestroy {
   }
 
   onBookmarkAdded(newBookmarkId: string) {
+    this.scrollMainContainerToBottom();
     this.addingNewBookmark = false;
     const newBookmark = this.items.find(
       (bookmark) => bookmark.id === newBookmarkId

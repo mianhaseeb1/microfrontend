@@ -44,7 +44,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     comment: [''],
     links: this.fb.array([this.createLink()]),
   });
-
+  @Output() scrollRequest = new EventEmitter<void>();
   @ViewChildren('textarea') textareas!: QueryList<ElementRef>;
   @Input() item: any;
   @Output() bookmarkAdded = new EventEmitter<string>();
@@ -69,6 +69,11 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       },
     });
   }
+
+  requestScroll() {
+    this.scrollRequest.emit();
+  }
+
   ngOnInit(): void {
     if (!this.item || !this.item.id) {
       this.enableEditMode();
@@ -108,6 +113,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   }
 
   onSubmit(): void {
+    this.requestScroll();
     const formValue = this.form.value;
     const linkStrings = formValue
       .links!.map((linkObj) => linkObj.link.trim())
@@ -137,6 +143,8 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
         ? MESSAGE.successfully_added_bookmark
         : MESSAGE.successfully_updated_bookmark
     );
+
+    this.requestScroll();
   }
 
   initializeLinks(links: string[]): void {
@@ -180,7 +188,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       BookmarkActions.updateBookmark({ bookmark: updatedBookmark })
     );
     this._snackBar.open(MESSAGE.successfully_updated_bookmark);
-
+    this.requestScroll();
     this.editMode = false;
     this.cdr.detectChanges();
   }
@@ -209,6 +217,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   }
 
   addLink(): void {
+    this.requestScroll();
     this.links.push(this.createLink());
   }
 
@@ -246,6 +255,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     this.lastDeletedItem = this.item;
     this.store.dispatch(BookmarkActions.deleteBookmark({ id }));
     this.showUndoSnackbar();
+    this.requestScroll();
   }
 
   private showUndoSnackbar() {
@@ -265,5 +275,6 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     snackBarRef.afterDismissed().subscribe(() => {
       this.lastDeletedItem = null;
     });
+    this.requestScroll();
   }
 }

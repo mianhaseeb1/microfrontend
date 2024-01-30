@@ -4,6 +4,7 @@
   position: relative;
   width: 900px;
   justify-content: center;
+  background: #fafcfd;
   &:hover .hover-icons {
     display: block;
   }
@@ -31,6 +32,7 @@
     width: 800px;
     border-radius: 16px;
     box-shadow: 0 0 5px #9a9a9a;
+    background: #ffffff;
     .title {
       .input-group {
         border-bottom: 1px solid #8d8d8d;

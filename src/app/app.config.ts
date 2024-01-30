@@ -9,6 +9,7 @@ import { provideEffects } from '@ngrx/effects';
 import { metaReducers, reducers } from './store/reducers';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { ChatEffects } from './store/effects/chat.effects';
+import { AuthEffects } from './store/effects/auth.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideHttpClient(),
     provideStore(reducers, { metaReducers }),
-    provideEffects([ChatEffects]),
+    provideEffects([ChatEffects, AuthEffects]),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: !isDevMode(),

@@ -3,8 +3,9 @@ import { MaterialModule } from './material.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { ClickOutsideDirective } from '../directives/click-outside.directive';
+import { ReversePipe } from '../pipes/reverse-loop.pipe';
 @NgModule({
-  declarations: [ClickOutsideDirective],
+  declarations: [ClickOutsideDirective, ReversePipe],
   imports: [MaterialModule, FormsModule, ReactiveFormsModule, HttpClientModule],
   exports: [
     MaterialModule,
@@ -12,6 +13,7 @@ import { ClickOutsideDirective } from '../directives/click-outside.directive';
     ReactiveFormsModule,
     HttpClientModule,
     ClickOutsideDirective,
+    ReversePipe,
   ],
 })
 export class SharedModule {}

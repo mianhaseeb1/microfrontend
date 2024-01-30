@@ -1,9 +1,9 @@
 <app-nav-bar></app-nav-bar>
-<div class="main">
+<div class="main" #mainContainer>
   <div cdkDropList class="bookmark-list" (cdkDropListDropped)="drop($event)">
     <div *ngFor="let item of items$ | async; let i = index" class="bookmark-item mt-4" cdkDrag>
       <div>
-        <app-bookmark-input [item]="item"></app-bookmark-input>
+        <app-bookmark-input [item]="item" (scrollRequest)="scrollMainContainerToBottom()"></app-bookmark-input>
       </div>
     </div>
   </div>
@@ -35,7 +35,16 @@
       </div>
     </div>
   </div>
-  <div class="btns-main">
+  <div class="btns-main justify-betwen">
+    <div class="scroll">
+      <button *ngIf="!showScrollToTopButton" mat-fab color="primary" class="scroll-btn bottom" (click)="scrollToBottom()">
+        <mat-icon>arrow_downward</mat-icon>
+      </button>
+
+      <button *ngIf="showScrollToTopButton" mat-fab color="primary" class="scroll-btn top" (click)="scrollToTop()">
+        <mat-icon>arrow_upward</mat-icon>
+      </button>
+    </div>
     <div class="btns">
       <div class="web-bookmark-btn">
         <button mat-raised-button matTooltip="Add Web Bookmarks" matTooltipPosition="above" (click)="addNewBookmark()">
@@ -48,14 +57,13 @@
         </button>
       </div>
     </div>
+    <div class="chat-btn" *ngIf="!showInput">
+      <button mat-raised-button matTooltip="New Chat" matTooltipPosition="left" (click)="toggleChat()" id="new-chat">
+        <span class="material-symbols-outlined"> chat </span>
+      </button>
+    </div>
   </div>
 </div>
-<div class="chat-btn" *ngIf="!showInput">
-  <button mat-raised-button matTooltip="New Chat" matTooltipPosition="left" (click)="toggleChat()" id="new-chat">
-    <span class="material-symbols-outlined"> chat </span>
-  </button>
-</div>
-
 <div *ngIf="showInput" class="chat-input">
   <mat-form-field appearance="outline" class="example-full-width">
     <mat-label>Type a message</mat-label>
@@ -65,11 +73,3 @@
     </button>
   </mat-form-field>
 </div>
-
-<button *ngIf="!showScrollToTopButton" mat-fab color="primary" class="scroll-btn bottom" (click)="scrollToBottom()">
-  <mat-icon>arrow_downward</mat-icon>
-</button>
-
-<button *ngIf="showScrollToTopButton" mat-fab color="primary" class="scroll-btn top" (click)="scrollToTop()">
-  <mat-icon>arrow_upward</mat-icon>
-</button>

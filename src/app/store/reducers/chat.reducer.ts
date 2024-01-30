@@ -10,6 +10,7 @@ export interface ChatMessage {
 export interface ChatSession {
   id: string;
   messages: ChatMessage[];
+  ended: boolean;
 }
 
 export interface ChatState {
@@ -26,7 +27,10 @@ export const chatReducer = createReducer(
   on(ChatActions.startNewSession, (state, { sessionId }) => ({
     ...state,
     currentSessionId: sessionId,
-    sessions: [...state.sessions, { id: sessionId, messages: [] }],
+    sessions: [
+      ...state.sessions,
+      { id: sessionId, messages: [], ended: false },
+    ],
   })),
   on(ChatActions.sendMessage, (state, { sessionId, message }) => {
     const sessions = state.sessions.map((session) =>
@@ -55,5 +59,17 @@ export const chatReducer = createReducer(
         : session
     );
     return { ...state, sessions };
+  }),
+  on(ChatActions.endSession, (state, { sessionId }) => {
+    return {
+      ...state,
+      sessions: state.sessions.map((session) =>
+        session.id === sessionId ? { ...session, ended: true } : session
+      ),
+      currentSessionId:
+        state.currentSessionId === sessionId
+          ? undefined
+          : state.currentSessionId,
+    };
   })
 );
