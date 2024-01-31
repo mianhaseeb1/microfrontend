@@ -12,6 +12,7 @@ import {
   CdkDropList,
   CdkDrag,
   moveItemInArray,
+  transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { SharedModule } from '../../../shared/shared.module';
 import { CommonModule } from '@angular/common';
@@ -22,7 +23,7 @@ import { RouterModule } from '@angular/router';
 import { EditorService } from '../../../services/ckeditor.service';
 import InlineEditor from '@ckeditor/ckeditor5-build-inline';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import { Observable, Subject, map, take, takeUntil } from 'rxjs';
+import { Observable, Subject, map, take, takeUntil, tap } from 'rxjs';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import * as NotebookActions from '../../../store/actions/notes.actions';
 import { Store } from '@ngrx/store';
@@ -64,7 +65,7 @@ export class NewPageComponent implements OnInit, OnDestroy {
   notebooks$!: Observable<Notebook[]>;
   showInput: boolean = false;
   @ViewChild('mainContainer') private mainContainer!: ElementRef;
-  //messages$!: Observable<fromChatReducer.ChatState['messages']>;
+  chatSessions: ChatSession[] = [];
   currentSessionId: string = '';
   chatSessions$!: Observable<ChatSession[]>;
   currentSessionMessages$!: Observable<fromChatReducer.ChatMessage[]>;
@@ -83,9 +84,12 @@ export class NewPageComponent implements OnInit, OnDestroy {
     this.items$ = this.store.select(fromBookmark.selectAllBookmarks);
     this.store.dispatch(NotebookActions.loadNotes());
     this.notebooks$ = this.store.select(fromNotebook.selectAllNotebooks);
-    //this.messages$ = this.store.select(ChatSelectors.selectMessages);
     this.chatSessions$ = this.store.select(ChatSelectors.selectChatSessions);
-    this.chatSessions$ = this.store.select(ChatSelectors.selectChatSessions);
+    this.chatSessions$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((sessions) => {
+        this.chatSessions = sessions;
+      });
 
     this.currentSessionMessages$ = this.store.select(
       ChatSelectors.selectMessagesFromSession(this.currentSessionId)
@@ -97,6 +101,18 @@ export class NewPageComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.refreshBookmarks();
       });
+
+    this.items$.subscribe((items) => {
+      this.items = items || [];
+    });
+
+    this.notebooks$.subscribe((notebooks) => {
+      this.notebooks = notebooks || [];
+    });
+
+    this.chatSessions$.subscribe((sessions) => {
+      this.chatSessions = sessions || [];
+    });
   }
 
   scrollMainContainerToBottom(): void {
@@ -106,27 +122,48 @@ export class NewPageComponent implements OnInit, OnDestroy {
     }, 100);
   }
 
-  drop(event: CdkDragDrop<Bookmark[]>): void {
-    this.items$
-      .pipe(
-        take(1),
-        map((items) => {
-          const updatedItems = [...items];
-          moveItemInArray(
-            updatedItems,
-            event.previousIndex,
-            event.currentIndex
-          );
-          return updatedItems;
-        })
-      )
-      .subscribe((updatedItems) => {
-        this.store.dispatch(
-          BookmarkActions.updateBookmarksOrder({ bookmarks: updatedItems })
-        );
-        this.items = updatedItems;
-      });
+  drop(event: CdkDragDrop<any[]>) {
+    if (!event.previousContainer.data || !event.container.data) {
+      console.error('One of the containers has null data');
+      return;
+    }
+
+    if (event.previousContainer === event.container) {
+      const updatedItems = [...event.container.data];
+      moveItemInArray(updatedItems, event.previousIndex, event.currentIndex);
+    } else {
+      const previousItems = [...event.previousContainer.data];
+      const currentItems = [...event.container.data];
+      transferArrayItem(
+        previousItems,
+        currentItems,
+        event.previousIndex,
+        event.currentIndex
+      );
+    }
   }
+
+  // drop(event: CdkDragDrop<Bookmark[]>): void {
+  //   this.items$
+  //     .pipe(
+  //       take(1),
+  //       map((items) => {
+  //         const updatedItems = [...items];
+  //         moveItemInArray(
+  //           updatedItems,
+  //           event.previousIndex,
+  //           event.currentIndex
+  //         );
+  //         return updatedItems;
+  //       })
+  //     )
+  //     .subscribe((updatedItems) => {
+  //       this.store.dispatch(
+  //         BookmarkActions.updateBookmarksOrder({ bookmarks: updatedItems })
+  //       );
+  //       this.items = updatedItems;
+  //     });
+  // }
 
   refreshBookmarks() {
     this.store.dispatch(BookmarkActions.loadBookmarks());
