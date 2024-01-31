@@ -11,5 +11,5 @@ export const routes: Routes = [
   { path: 'new-page', component: NewPageComponent },
   { path: 'add-web-bookmark', component: AddBookmarkComponent },
   { path: 'add-notes', component: AddNotesComponent },
-  { path: '', pathMatch: 'full', redirectTo: '/login' },
+  { path: '', pathMatch: 'full', redirectTo: '/auth/login' },
 ];
