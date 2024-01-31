@@ -7,7 +7,7 @@ import { AddNotesComponent } from './main/pages/add-notes/add-notes.component';
 
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },
-  { path: 'login', component: LoginComponent },
+  { path: 'auth/login', component: LoginComponent },
   { path: 'new-page', component: NewPageComponent },
   { path: 'add-web-bookmark', component: AddBookmarkComponent },
   { path: 'add-notes', component: AddNotesComponent },

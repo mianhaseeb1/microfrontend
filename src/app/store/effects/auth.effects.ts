@@ -5,6 +5,7 @@ import * as AuthActions from '../actions/auth.actions';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { of } from 'rxjs';
+import { AuthCallbackResponse } from '../../models/auth.model';
 
 @Injectable()
 export class AuthEffects {
@@ -28,7 +29,12 @@ export class AuthEffects {
       ofType(AuthActions.handleAuthCallback),
       mergeMap((action) =>
         this.authService.handleAuthCallback(action.code).pipe(
-          map((user) => AuthActions.loginSuccess({ user })),
+          map((callbackResponse: AuthCallbackResponse) => {
+            const user = callbackResponse.data.userInfo;
+            const accessToken = callbackResponse.data.accessToken;
+            sessionStorage.setItem('accessToken', accessToken);
+            return AuthActions.loginSuccess({ user, accessToken });
+          }),
           catchError((error) => of(AuthActions.loginFailure({ error })))
         )
       )

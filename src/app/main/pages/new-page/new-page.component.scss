@@ -3,18 +3,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  height: 85vh;
-  padding: 60px 0 10px 0;
-  overflow-y: auto;
+  height: 100vh;
+  padding: 55px 0 150px 0;
   .btns-main {
     position: fixed;
-    bottom: 0;
+    bottom: 15px;
     display: flex;
     align-items: center;
-    padding: 30px;
+    padding: 15px;
     margin-top: 15px;
-    background: #ffffff;
-    width: 100%;
+    gap: 15px;
+    background: #efefef;
+    width: auto;
     box-shadow: 0 0 4px #ccc;
     .btns {
       display: flex;
@@ -72,6 +72,7 @@
 .chat-input mat-form-field {
   transition: width 0.5s ease-in-out;
   width: 0;
+  background: #ffffff;
 }
 
 .chat-input.active mat-form-field {
@@ -96,9 +97,9 @@
 }
 
 #new-chat {
-  width: 70px;
+  width: 78px;
   height: 70px;
-  border-radius: 50%;
+  border-radius: 16px !important;
 }
 
 .messages {
