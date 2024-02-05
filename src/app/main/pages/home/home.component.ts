@@ -5,6 +5,10 @@ import { HomeMainContentComponent } from '../../components/home-main-content/hom
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { NavBarComponent } from '../../../shared/components/nav-bar/nav-bar.component';
 import { RouterModule } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { EditNotebookComponent } from '../../dialogs/edit-notebook/edit-notebook.component';
+import { Store } from '@ngrx/store';
+import { loadPages } from '../../../store/actions/pages.actions';
 
 @Component({
   selector: 'app-home',
@@ -22,8 +26,15 @@ import { RouterModule } from '@angular/router';
 })
 export class HomeComponent {
   selectedValue!: string;
+  constructor(public dialog: MatDialog, private store: Store) {}
 
-  isSelected(value: string): boolean {
-    return this.selectedValue === value;
+  addNotebook(): void {
+    const dialogRef = this.dialog.open(EditNotebookComponent, {
+      width: '350px',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      this.store.dispatch(loadPages({ userId: 1 }));
+    });
   }
 }

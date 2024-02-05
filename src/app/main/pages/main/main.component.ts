@@ -32,13 +32,14 @@ import * as fromNotebook from '../../../store/selectors/notes.selectors';
 import { v4 as uuidv4 } from 'uuid';
 import { Notebook } from '../../../models/notebook.model';
 import { NotebookService } from '../../../services/notebook.service';
-import { AddNotesComponent } from '../add-notes/add-notes.component';
+import { NotesComponent } from '../../components/notes/notes.component';
 import * as fromChatReducer from '../../../store/reducers/chat.reducer';
 import * as ChatActions from '../../../store/actions/chat.actions';
 import * as ChatSelectors from '../../../store/selectors/chat.selectors';
-import { ChatSession } from '../../../store/reducers/chat.reducer';
+import { ChatMessage, ChatSession } from '../../../store/reducers/chat.reducer';
+import { DomSanitizer } from '@angular/platform-browser';
 @Component({
-  selector: 'app-new-page',
+  selector: 'app-main',
   standalone: true,
   imports: [
     CdkDropList,
@@ -49,12 +50,12 @@ import { ChatSession } from '../../../store/reducers/chat.reducer';
     NavBarComponent,
     RouterModule,
     CKEditorModule,
-    AddNotesComponent,
+    NotesComponent,
   ],
-  templateUrl: './new-page.component.html',
-  styleUrl: './new-page.component.scss',
+  templateUrl: './main.component.html',
+  styleUrl: './main.component.scss',
 })
-export class NewPageComponent implements OnInit, OnDestroy {
+export class MainComponent implements OnInit, OnDestroy {
   items: Bookmark[] = [];
   items$!: Observable<Bookmark[]>;
   editorContents: string[] = [];
@@ -70,12 +71,16 @@ export class NewPageComponent implements OnInit, OnDestroy {
   chatSessions$!: Observable<ChatSession[]>;
   currentSessionMessages$!: Observable<fromChatReducer.ChatMessage[]>;
   showScrollToTopButton: boolean = false;
+  editingMessage: ChatMessage | null = null;
+  originalContent: string = '';
+  editingContent: string = '';
 
   constructor(
     private bookmarkService: BookmarkService,
     private editorService: EditorService,
     public store: Store,
-    private notebookService: NotebookService
+    private notebookService: NotebookService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -142,28 +147,6 @@ export class NewPageComponent implements OnInit, OnDestroy {
       );
     }
   }
-
-  // drop(event: CdkDragDrop<Bookmark[]>): void {
-  //   this.items$
-  //     .pipe(
-  //       take(1),
-  //       map((items) => {
-  //         const updatedItems = [...items];
-  //         moveItemInArray(
-  //           updatedItems,
-  //           event.previousIndex,
-  //           event.currentIndex
-  //         );
-  //         return updatedItems;
-  //       })
-  //     )
-  //     .subscribe((updatedItems) => {
-  //       this.store.dispatch(
-  //         BookmarkActions.updateBookmarksOrder({ bookmarks: updatedItems })
-  //       );
-  //       this.items = updatedItems;
-  //     });
-  // }
 
   refreshBookmarks() {
     this.store.dispatch(BookmarkActions.loadBookmarks());
@@ -292,6 +275,70 @@ export class NewPageComponent implements OnInit, OnDestroy {
       top: document.body.scrollHeight,
       behavior: 'smooth',
     });
+  }
+
+  sanitizeHTML(htmlContent: string) {
+    return this.sanitizer.bypassSecurityTrustHtml(htmlContent);
+  }
+
+  isEditable(message: ChatMessage): boolean {
+    return this.editingMessage === message;
+  }
+  onMessageEditEnter(
+    message: ChatMessage,
+    newContent: string,
+    event: any
+  ): void {
+    event.preventDefault();
+    this.finishEditing(message, newContent);
+  }
+
+  onMessageEditDone(message: ChatMessage, newContent: string): void {
+    this.finishEditing(message, newContent);
+  }
+
+  startEditing(message: ChatMessage): void {
+    this.editingMessage = message;
+    this.originalContent = message.content;
+    this.editingContent = message.content;
+  }
+
+  finishEditing(message: ChatMessage, newContent: string): void {
+    if (newContent !== this.originalContent) {
+      const botMessageId = this.getBotMessageIdForUserMessage(message.id);
+
+      this.store.dispatch(
+        ChatActions.editMessage({
+          sessionId: this.currentSessionId,
+          userMessageId: message.id,
+          botMessageId: botMessageId,
+          newContent,
+          isEdit: true,
+        })
+      );
+    }
+
+    this.editingMessage = null;
+    this.originalContent = '';
+    this.editingContent = '';
+  }
+
+  private getBotMessageIdForUserMessage(userMessageId: string): string | null {
+    let foundUserMessage = false;
+
+    for (const session of this.chatSessions) {
+      for (const message of session.messages) {
+        if (foundUserMessage && message.sender === 'bot') {
+          return message.id;
+        }
+
+        if (message.id === userMessageId) {
+          foundUserMessage = true;
+        }
+      }
+    }
+
+    return null;
   }
 
   @HostListener('window:scroll', ['$event'])

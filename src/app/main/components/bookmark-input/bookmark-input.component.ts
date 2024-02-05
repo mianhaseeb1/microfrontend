@@ -17,10 +17,8 @@ import { EditNotebookComponent } from '../../dialogs/edit-notebook/edit-notebook
 import { MatDialog } from '@angular/material/dialog';
 import { Bookmark } from '../../../models/bookmark.model';
 import { BookmarkService } from '../../../services/bookmark.service';
-import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MESSAGE } from '../../../utils/MESSAGES';
-import { DeleteNotebookComponent } from '../../dialogs/delete-notebook/delete-notebook.component';
 import { Store } from '@ngrx/store';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import { v4 as uuidv4 } from 'uuid';

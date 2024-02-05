@@ -9,17 +9,16 @@ import { Notebook } from '../../../models/notebook.model';
 import { Store } from '@ngrx/store';
 import * as NotebookActions from '../../../store/actions/notes.actions';
 import { Subject, debounceTime } from 'rxjs';
-import { DeleteNotebookComponent } from '../../dialogs/delete-notebook/delete-notebook.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
-  selector: 'app-add-notes',
+  selector: 'app-notes',
   standalone: true,
   imports: [SharedModule, CommonModule, HttpClientModule, CKEditorModule],
-  templateUrl: './add-notes.component.html',
-  styleUrl: './add-notes.component.scss',
+  templateUrl: './notes.component.html',
+  styleUrl: './notes.component.scss',
 })
-export class AddNotesComponent {
+export class NotesComponent {
   editorContent: string = '';
   @ViewChild('editor', { static: true }) editorRef!: ElementRef;
   @ViewChild('editorContainer', { static: true })

@@ -1,3 +1,4 @@
+@if(!loading){
 <div class="main-login">
   <div class="header">
     <div class="logo">
@@ -28,3 +29,7 @@
     </div>
   </footer>
 </div>
+}
+@if(loading){
+<mat-spinner></mat-spinner>
+}

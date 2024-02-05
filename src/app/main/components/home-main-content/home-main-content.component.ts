@@ -1,9 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SharedModule } from '../../../shared/shared.module';
-import { PAGES_CARDS } from '../../../data/pages-cards.data';
-import { IPagesCards } from '../../../models/pages-cards.model';
+import { IPagesCards, PagesData } from '../../../models/pages-cards.model';
 import { RouterModule } from '@angular/router';
+import { Observable, map } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { loadPages } from '../../../store/actions/pages.actions';
+import {
+  selectAllPages,
+  selectPageError,
+} from '../../../store/selectors/pages.selectors';
 
 @Component({
   selector: 'app-home-main-content',
@@ -12,29 +18,14 @@ import { RouterModule } from '@angular/router';
   templateUrl: './home-main-content.component.html',
   styleUrl: './home-main-content.component.scss',
 })
-export class HomeMainContentComponent {
-  activeButton: string = '';
-  buttonList: Array<string> = [
-    'All',
-    'New updates',
-    'Shared notebooks',
-    'My notebooks',
-  ];
+export class HomeMainContentComponent implements OnInit {
+  cardItems$: Observable<IPagesCards> = this.store.select(selectAllPages);
+  pageError$: Observable<string> = this.store.select(selectPageError);
+  data: PagesData[] = [];
 
-  cardItems: Array<IPagesCards> = PAGES_CARDS;
+  constructor(private store: Store) {}
 
-  isActiveButton(button: string): boolean {
-    return this.activeButton == button;
-  }
-  setActiveButton(button: string): void {
-    this.activeButton = button;
-  }
-
-  getButtonStyle(button: string) {
-    if (this.isActiveButton(button)) {
-      return { background: '#EEF4FF', color: '#0D3074' };
-    } else {
-      return { color: 'grey' };
-    }
+  ngOnInit() {
+    this.store.dispatch(loadPages({ userId: 1 }));
   }
 }

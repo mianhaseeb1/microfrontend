@@ -5,12 +5,14 @@ import { v4 as uuidv4 } from 'uuid';
 export interface ChatMessage {
   sender: 'user' | 'bot';
   content: string;
+  id: string;
 }
 
 export interface ChatSession {
   id: string;
   messages: ChatMessage[];
   ended: boolean;
+  loading?: boolean;
 }
 
 export interface ChatState {
@@ -37,9 +39,10 @@ export const chatReducer = createReducer(
       session.id === sessionId
         ? {
             ...session,
+            loading: true,
             messages: [
               ...session.messages,
-              { sender: 'user' as 'user', content: message },
+              { id: uuidv4(), sender: 'user' as const, content: message },
             ],
           }
         : session
@@ -51,15 +54,17 @@ export const chatReducer = createReducer(
       session.id === sessionId
         ? {
             ...session,
+            loading: false,
             messages: [
               ...session.messages,
-              { sender: 'bot' as 'bot', content: message },
+              { id: uuidv4(), sender: 'bot' as const, content: message },
             ],
           }
         : session
     );
     return { ...state, sessions };
   }),
+
   on(ChatActions.endSession, (state, { sessionId }) => {
     return {
       ...state,
@@ -71,5 +76,44 @@ export const chatReducer = createReducer(
           ? undefined
           : state.currentSessionId,
     };
-  })
+  }),
+  on(
+    ChatActions.editMessage,
+    (state, { sessionId, userMessageId, botMessageId, newContent, isEdit }) => {
+      const sessions = state.sessions.map((session) => {
+        if (session.id === sessionId) {
+          let newUserMessageIndex = -1;
+
+          const filteredMessages = session.messages.filter((message, index) => {
+            if (message.id === userMessageId) {
+              newUserMessageIndex = index;
+              return false;
+            }
+            return botMessageId ? message.id !== botMessageId : true;
+          });
+
+          const newUserMessage: ChatMessage = {
+            id: userMessageId,
+            sender: 'user',
+            content: newContent,
+          };
+
+          if (newUserMessageIndex !== -1) {
+            filteredMessages.splice(newUserMessageIndex, 0, newUserMessage);
+          } else {
+            filteredMessages.push(newUserMessage);
+          }
+
+          return {
+            ...session,
+            messages: filteredMessages,
+          };
+        } else {
+          return session;
+        }
+      });
+
+      return { ...state, sessions };
+    }
+  )
 );

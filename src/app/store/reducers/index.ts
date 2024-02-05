@@ -11,6 +11,7 @@ import { notesReducer, Notestate } from './notes.reducer';
 import { authReducer, AuthState } from './auth.reducer';
 import { chatReducer, ChatState } from './chat.reducer';
 import { draggableReducer, DraggableState } from './draggable.reducers';
+import { pageReducer, PageState } from './pages.reducer';
 
 export interface State {
   bookmarks: BookmarkState;
@@ -18,6 +19,7 @@ export interface State {
   auth: AuthState;
   chat: ChatState;
   draggable: DraggableState;
+  pages: PageState;
 }
 
 export const reducers: ActionReducerMap<State> = {
@@ -26,6 +28,7 @@ export const reducers: ActionReducerMap<State> = {
   auth: authReducer,
   chat: chatReducer,
   draggable: draggableReducer,
+  pages: pageReducer,
 };
 
 export const metaReducers: MetaReducer<State>[] = isDevMode() ? [] : [];

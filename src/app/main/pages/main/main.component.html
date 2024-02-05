@@ -1,0 +1,87 @@
+<app-nav-bar></app-nav-bar>
+<div class="main" #mainContainer>
+  <div cdkDropList #bookmarkList="cdkDropList" [cdkDropListData]="items" [cdkDropListConnectedTo]="[notebookList, chatList]" class="bookmark-list"
+    (cdkDropListDropped)="drop($event)">
+    <div *ngFor="let item of items$ | async; let i = index" class="bookmark-item mt-4" cdkDrag>
+      <div>
+        <app-bookmark-input [item]="item" (scrollRequest)="scrollMainContainerToBottom()"></app-bookmark-input>
+      </div>
+    </div>
+  </div>
+  <div cdkDropList #notebookList="cdkDropList" [cdkDropListData]="notebooks" [cdkDropListConnectedTo]="[bookmarkList, chatList]" class="notebook-list"
+    (cdkDropListDropped)="drop($event)">
+    <div *ngFor="let notebook of notebooks$ | async; let i = index" class="notebook-item mt-3" cdkDrag>
+      <app-notes [notebook]="notebook"></app-notes>
+    </div>
+  </div>
+
+  <div cdkDropList #chatList="cdkDropList" [cdkDropListData]="chatSessions" [cdkDropListConnectedTo]="[bookmarkList, notebookList]" class="chat-list"
+    (cdkDropListDropped)="drop($event)">
+    <div *ngFor="let chatSession of chatSessions$ | async; let sessionIndex = index" class="chat-session" cdkDrag>
+      <div class="messages mt-3">
+        <div class="flex-messages">
+          <div *ngFor="let message of chatSession.messages"
+            [ngClass]="{'user-message': message.sender === 'user', 'bot-message': message.sender === 'bot'}">
+            <div class="align-center">
+              <div class="main-ch">
+                @if(chatSession.loading && message.sender === 'bot'){
+                <mat-spinner diameter="30"></mat-spinner>
+                }
+                @if(message.sender === 'user'){
+                <textarea *ngIf="isEditable(message)" type="text" [(ngModel)]="editingContent" (blur)="onMessageEditDone(message, editingContent)"
+                  (keydown.enter)="onMessageEditEnter(message, editingContent, $event)" class="input-chat-edit"></textarea>
+
+
+                <p *ngIf="!isEditable(message)" (click)="startEditing(message)">{{ message.content }}</p>
+                }
+                @if(message.sender === 'bot'){
+                <p [innerHTML]="sanitizeHTML(message.content)"></p>
+                }
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="btns-main justify-center gap-15" *ngIf="!showInput">
+    <div class="btns">
+      <div class="web-bookmark-btn">
+        <button mat-icon-button matTooltip="Add Web Bookmarks" matTooltipPosition="above" (click)="addNewBookmark()">
+          <span class="material-symbols-outlined"> bookmark </span>
+        </button>
+      </div>
+      <div class="notes-btn">
+        <button mat-icon-button matTooltip="Add Notes" matTooltipPosition="above" (click)="addNewNotebook()">
+          <span class="material-symbols-outlined"> add_notes </span>
+        </button>
+      </div>
+    </div>
+    <div class="chat-btn">
+      <button mat-icon-button matTooltip="New Chat" matTooltipPosition="above" (click)="toggleChat()">
+        <span class="material-symbols-outlined"> chat </span>
+      </button>
+    </div>
+    <div class="menu-btn">
+      <button mat-icon-button matTooltip="More items" matTooltipPosition="above">
+        <span class="material-symbols-outlined"> more_vert </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showInput" class="chat-input">
+  <div class="">
+    <mat-form-field appearance="fill" class="example-full-width">
+      <mat-label>Type a message</mat-label>
+      <input matInput #chatInput placeholder="Ask me anything..." (keyup.enter)="onSendMessage(chatInput.value); chatInput.value=''">
+    </mat-form-field>
+    <button mat-icon-button matTooltip="Close" (click)="toggleChat()" matSuffix id="x-close">
+      <span class="material-symbols-outlined"> close </span>
+    </button>
+    <div class="send-btn">
+      <button mat-flat-button (click)="onSendMessage(chatInput.value)">Send</button>
+    </div>
+  </div>
+</div>

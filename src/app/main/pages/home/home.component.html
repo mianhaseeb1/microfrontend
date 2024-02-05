@@ -2,20 +2,23 @@
 <div class="home">
   <div class="main">
     <div class="create-div">
-      <mat-card class="pointer" routerLink="/new-page">
-        <mat-card-content class="justify-center">
-          <div class="content align-center">
-            <div class="icon">
-              <img src="/assets/icons/add_circle.svg" alt="">
+      <a (click)="addNotebook()">
+        <mat-card class="pointer">
+          <mat-card-content class="justify-center">
+            <div class="content align-center">
+              <div class="icon">
+                <img src="/assets/icons/add_circle.svg" alt="">
+              </div>
+              <div class="txt">
+                <p class="blue-text">
+
+                  &nbsp;&nbsp;&nbsp;Start a new Notebook page
+                </p>
+              </div>
             </div>
-            <div class="txt">
-              <p class="blue-text">
-                &nbsp;&nbsp;&nbsp;Start a new Notebook page
-              </p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+          </mat-card-content>
+        </mat-card>
+      </a>
     </div>
   </div>
   <app-home-main-content></app-home-main-content>

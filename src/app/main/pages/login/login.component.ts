@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SharedModule } from '../../../shared/shared.module';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import * as AuthActions from '../../../store/actions/auth.actions';
 @Component({
@@ -10,8 +10,14 @@ import * as AuthActions from '../../../store/actions/auth.actions';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
-export class LoginComponent {
-  constructor(private store: Store) {}
+export class LoginComponent implements OnInit {
+  loading: boolean = false;
+
+  constructor(private store: Store, private route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((res) => (this.loading = res['code']));
+  }
 
   login() {
     this.store.dispatch(AuthActions.login());

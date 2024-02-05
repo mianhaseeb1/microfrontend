@@ -2,7 +2,7 @@ import { createAction, props } from '@ngrx/store';
 
 export const sendMessage = createAction(
   '[Chat] Send Message',
-  props<{ sessionId: string; message: string }>()
+  props<{ sessionId: string; message: string; isEdit?: boolean }>()
 );
 
 export const receiveMessage = createAction(
@@ -18,4 +18,15 @@ export const startNewSession = createAction(
 export const endSession = createAction(
   '[Chat] End Session',
   props<{ sessionId: string }>()
+);
+
+export const editMessage = createAction(
+  '[Chat] Edit Message',
+  props<{
+    sessionId: string;
+    userMessageId: string;
+    botMessageId: string | null;
+    newContent: string;
+    isEdit: boolean;
+  }>()
 );
