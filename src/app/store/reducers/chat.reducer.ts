@@ -107,6 +107,7 @@ export const chatReducer = createReducer(
           return {
             ...session,
             messages: filteredMessages,
+            ended: isEdit,
           };
         } else {
           return session;

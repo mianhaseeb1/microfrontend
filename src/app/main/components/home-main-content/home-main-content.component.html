@@ -15,7 +15,7 @@
     <div class="card-content-divs mb-5" *ngIf="cardItems$ | async as cardItems">
       <div *ngFor="let item of cardItems.data">
         <div class="card-wrapper">
-          <mat-card routerLink="chat-main" class="pointer">
+          <mat-card (click)="selectNotebook(item)" class="pointer">
             <mat-card-content>
               <div class="main-card justify-betwen">
                 <div class="text-area">

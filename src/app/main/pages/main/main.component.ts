@@ -23,7 +23,7 @@ import { RouterModule } from '@angular/router';
 import { EditorService } from '../../../services/ckeditor.service';
 import InlineEditor from '@ckeditor/ckeditor5-build-inline';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import { Observable, Subject, map, take, takeUntil, tap } from 'rxjs';
+import { Observable, Subject, take, takeUntil,  } from 'rxjs';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import * as NotebookActions from '../../../store/actions/notes.actions';
 import { Store } from '@ngrx/store';
@@ -31,13 +31,14 @@ import * as fromBookmark from '../../../store/selectors/bookmark.selectors';
 import * as fromNotebook from '../../../store/selectors/notes.selectors';
 import { v4 as uuidv4 } from 'uuid';
 import { Notebook } from '../../../models/notebook.model';
-import { NotebookService } from '../../../services/notebook.service';
 import { NotesComponent } from '../../components/notes/notes.component';
 import * as fromChatReducer from '../../../store/reducers/chat.reducer';
 import * as ChatActions from '../../../store/actions/chat.actions';
 import * as ChatSelectors from '../../../store/selectors/chat.selectors';
 import { ChatMessage, ChatSession } from '../../../store/reducers/chat.reducer';
 import { DomSanitizer } from '@angular/platform-browser';
+import { PagesData } from '../../../models/pages-cards.model';
+import { SharedService } from '../../../services/shared.service';
 @Component({
   selector: 'app-main',
   standalone: true,
@@ -74,12 +75,15 @@ export class MainComponent implements OnInit, OnDestroy {
   editingMessage: ChatMessage | null = null;
   originalContent: string = '';
   editingContent: string = '';
+  item$: Observable<PagesData | null> = this.sharedService.currentData;
+  showButtons: boolean = true;
+  lastScrollTop: number = 0;
 
   constructor(
     private bookmarkService: BookmarkService,
     private editorService: EditorService,
     public store: Store,
-    private notebookService: NotebookService,
+    private sharedService: SharedService,
     private sanitizer: DomSanitizer
   ) {}
 
@@ -154,6 +158,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
   toggleChat() {
     this.showInput = !this.showInput;
+    this.scrollToBottom();
     if (this.showInput) {
       this.startNewChatSession();
       this.store
@@ -297,7 +302,8 @@ export class MainComponent implements OnInit, OnDestroy {
     this.finishEditing(message, newContent);
   }
 
-  startEditing(message: ChatMessage): void {
+  startEditing(sessionId: string, message: ChatMessage): void {
+     this.currentSessionId = sessionId;
     this.editingMessage = message;
     this.originalContent = message.content;
     this.editingContent = message.content;
@@ -306,7 +312,6 @@ export class MainComponent implements OnInit, OnDestroy {
   finishEditing(message: ChatMessage, newContent: string): void {
     if (newContent !== this.originalContent) {
       const botMessageId = this.getBotMessageIdForUserMessage(message.id);
-
       this.store.dispatch(
         ChatActions.editMessage({
           sessionId: this.currentSessionId,
@@ -341,20 +346,14 @@ export class MainComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  @HostListener('window:scroll', ['$event'])
-  onWindowScroll() {
-    const scrollTop =
-      window.pageYOffset ||
-      document.documentElement.scrollTop ||
-      document.body.scrollTop ||
-      0;
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-
-    if (scrollTop > (documentHeight - windowHeight) / 2) {
-      this.showScrollToTopButton = true;
+@HostListener('window:scroll', [])
+  onWindowScroll(): void {
+    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    if (currentScrollTop > this.lastScrollTop) {
+      this.showButtons = true;
     } else {
-      this.showScrollToTopButton = false;
+      this.showButtons = false;
     }
+    this.lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
   }
 }

@@ -1,4 +1,4 @@
-<app-nav-bar></app-nav-bar>
+<app-nav-bar [item$]="item$"></app-nav-bar>
 <div class="main" #mainContainer>
   <div cdkDropList #bookmarkList="cdkDropList" [cdkDropListData]="items" [cdkDropListConnectedTo]="[notebookList, chatList]" class="bookmark-list"
     (cdkDropListDropped)="drop($event)">
@@ -32,7 +32,7 @@
                   (keydown.enter)="onMessageEditEnter(message, editingContent, $event)" class="input-chat-edit"></textarea>
 
 
-                <p *ngIf="!isEditable(message)" (click)="startEditing(message)">{{ message.content }}</p>
+                <p *ngIf="!isEditable(message)" (click)="startEditing(chatSession.id ,message)">{{ message.content }}</p>
                 }
                 @if(message.sender === 'bot'){
                 <p [innerHTML]="sanitizeHTML(message.content)"></p>
@@ -45,27 +45,27 @@
       </div>
     </div>
   </div>
-  <div class="btns-main justify-center gap-15" *ngIf="!showInput">
+  <div [class.hidden]="!showInput && !showButtons" class="btns-main justify-center gap-15" *ngIf="!showInput && showButtons">
     <div class="btns">
       <div class="web-bookmark-btn">
         <button mat-icon-button matTooltip="Add Web Bookmarks" matTooltipPosition="above" (click)="addNewBookmark()">
-          <span class="material-symbols-outlined"> bookmark </span>
+          <span class="material-symbols-outlined bookmark-icon"> bookmark </span>
         </button>
       </div>
       <div class="notes-btn">
         <button mat-icon-button matTooltip="Add Notes" matTooltipPosition="above" (click)="addNewNotebook()">
-          <span class="material-symbols-outlined"> add_notes </span>
+          <span class="material-symbols-outlined notes-icon"> add_notes </span>
         </button>
       </div>
     </div>
     <div class="chat-btn">
       <button mat-icon-button matTooltip="New Chat" matTooltipPosition="above" (click)="toggleChat()">
-        <span class="material-symbols-outlined"> chat </span>
+        <img src="/assets/icons/ai.svg" alt="">
       </button>
     </div>
     <div class="menu-btn">
       <button mat-icon-button matTooltip="More items" matTooltipPosition="above">
-        <span class="material-symbols-outlined"> more_vert </span>
+        <span class="material-symbols-outlined menu-icon"> more_vert </span>
       </button>
     </div>
   </div>
