@@ -3,6 +3,18 @@
   gap: 20px;
   position: relative;
   width: 900px;
+  @media(max-width: 902px){
+      width: 600px;
+    }
+    @media(max-width: 650px){
+      width: 450px;
+    }
+    @media(max-width: 480px){
+      width: 360px;
+    }
+    @media(max-width: 400px){
+      width: 320px;
+    }
   justify-content: center;
   background: #fafcfd;
   &:hover .hover-icons {
@@ -30,6 +42,18 @@
   }
   .wrapper {
     width: 800px;
+    @media(max-width: 902px){
+      width: 600px;
+    }
+    @media(max-width: 650px){
+      width: 450px;
+    }
+    @media(max-width: 480px){
+      width: 360px;
+    }
+    @media(max-width: 400px){
+      width: 320px;
+    }
     border-radius: 16px;
     box-shadow: 0 0 5px #9a9a9a;
     background: #ffffff;

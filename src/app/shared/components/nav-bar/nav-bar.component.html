@@ -1,14 +1,15 @@
 <div class="main-toolbar">
   <mat-toolbar>
-    <ng-container *ngIf="item$ | async as item">
-      <div class="flex">
-        <div class="sales-proposal align-center pointer" routerLink="/home">
-          <div class="header align-center">
-            <div class="icon">
-              <img src="/assets/images/logo.svg" width="30px" alt="" />
-            </div>
+
+    <div class="flex">
+      <div class="sales-proposal align-center pointer" routerLink="/home">
+        <div class="header align-center">
+          <div class="icon">
+            <img src="/assets/images/logo.svg" width="30px" alt="" />
           </div>
         </div>
+      </div>
+      <ng-container *ngIf="item$ | async as item">
         <div class="title-res align-center">
           <div class="input-group custom-input-group pointer" routerLink="/home">
             <p>{{item.title}}</p>
@@ -17,16 +18,17 @@
             </div>
           </div>
         </div>
-        <div class="profile-side">
-          <div class="profile">
-            <div class="image">
-              <div class="pic pointer">
-                <img src="/assets/images/profile_pic.png" alt="" />
-              </div>
+      </ng-container>
+      <div class="profile-side">
+        <div class="profile">
+          <div class="image">
+            <div class="pic pointer">
+              <img src="/assets/images/profile_pic.png" alt="" />
             </div>
           </div>
         </div>
       </div>
-    </ng-container>
+    </div>
+
   </mat-toolbar>
 </div>

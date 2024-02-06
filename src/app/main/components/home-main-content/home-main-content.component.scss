@@ -4,6 +4,12 @@
   justify-content: center;
   .navigation {
     width: 775px;
+     @media(max-width: 820px){
+        width: 500px;
+      }
+      @media(max-width: 550px){
+            width: 300px;
+      }
     .justify-betwen {
       .btns {
         h3 {
