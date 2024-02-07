@@ -4,6 +4,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import {
   MatSnackBarModule,
   MAT_SNACK_BAR_DEFAULT_OPTIONS,
+  MatSnackBarHorizontalPosition,
+  MatSnackBarVerticalPosition,
 } from '@angular/material/snack-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
@@ -75,7 +77,14 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatExpansionModule,
   ],
   providers: [
-    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } },
+    {
+      provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
+      useValue: {
+        duration: 2500,
+        horizontalPosition: 'right' as MatSnackBarHorizontalPosition,
+        verticalPosition: 'bottom' as MatSnackBarVerticalPosition,
+      },
+    },
   ],
 })
 export class MaterialModule {}
