@@ -3,18 +3,18 @@
   gap: 20px;
   position: relative;
   width: 900px;
-  @media(max-width: 902px){
-      width: 600px;
-    }
-    @media(max-width: 650px){
-      width: 450px;
-    }
-    @media(max-width: 480px){
-      width: 360px;
-    }
-    @media(max-width: 400px){
-      width: 320px;
-    }
+  @media (max-width: 902px) {
+    width: 600px;
+  }
+  @media (max-width: 650px) {
+    width: 450px;
+  }
+  @media (max-width: 480px) {
+    width: 360px;
+  }
+  @media (max-width: 400px) {
+    width: 320px;
+  }
   justify-content: center;
   background: #fafcfd;
   &:hover .hover-icons {
@@ -42,16 +42,16 @@
   }
   .wrapper {
     width: 800px;
-    @media(max-width: 902px){
+    @media (max-width: 902px) {
       width: 600px;
     }
-    @media(max-width: 650px){
+    @media (max-width: 650px) {
       width: 450px;
     }
-    @media(max-width: 480px){
+    @media (max-width: 480px) {
       width: 360px;
     }
-    @media(max-width: 400px){
+    @media (max-width: 400px) {
       width: 320px;
     }
     border-radius: 16px;
@@ -131,8 +131,6 @@
 }
 
 .dim-background {
-  opacity: 0.7;
-  background-color: #000;
   position: fixed;
   top: 0;
   left: 0;

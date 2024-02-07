@@ -22,6 +22,7 @@ import { MESSAGE } from '../../../utils/MESSAGES';
 import { Store } from '@ngrx/store';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import { v4 as uuidv4 } from 'uuid';
+import { Subject, debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-bookmark-input',
@@ -46,7 +47,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   @ViewChildren('textarea') textareas!: QueryList<ElementRef>;
   @Input() item: any;
   @Output() bookmarkAdded = new EventEmitter<string>();
-
+  private saveSubject = new Subject<void>();
   constructor(
     private fb: FormBuilder,
     public dialog: MatDialog,
@@ -94,6 +95,10 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       });
       this.initializeLinks(this.item.links);
     }
+
+    this.saveSubject.pipe(debounceTime(5000)).subscribe(() => {
+      this.onSubmit();
+    });
 
     this.bookmarkService.notebookTitle$.subscribe((update) => {
       if (update.id === this.item.id) {
@@ -143,6 +148,10 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     );
 
     this.requestScroll();
+  }
+
+  triggerSaveOperation(): void {
+    this.saveSubject.next();
   }
 
   initializeLinks(links: string[]): void {
