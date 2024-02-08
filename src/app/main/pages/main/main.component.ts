@@ -23,7 +23,7 @@ import { RouterModule } from '@angular/router';
 import { EditorService } from '../../../services/ckeditor.service';
 import InlineEditor from '@ckeditor/ckeditor5-build-inline';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import { Observable, Subject, take, takeUntil,  } from 'rxjs';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import * as NotebookActions from '../../../store/actions/notes.actions';
 import { Store } from '@ngrx/store';
@@ -57,6 +57,7 @@ import { SharedService } from '../../../services/shared.service';
   styleUrl: './main.component.scss',
 })
 export class MainComponent implements OnInit, OnDestroy {
+  @ViewChild('autosize') autosize!: ElementRef;
   items: Bookmark[] = [];
   items$!: Observable<Bookmark[]>;
   editorContents: string[] = [];
@@ -78,6 +79,7 @@ export class MainComponent implements OnInit, OnDestroy {
   item$: Observable<PagesData | null> = this.sharedService.currentData;
   showButtons: boolean = true;
   lastScrollTop: number = 0;
+  editingContentBot: string = '';
 
   constructor(
     private bookmarkService: BookmarkService,
@@ -303,21 +305,64 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   startEditing(sessionId: string, message: ChatMessage): void {
-     this.currentSessionId = sessionId;
+    this.currentSessionId = sessionId;
     this.editingMessage = message;
     this.originalContent = message.content;
     this.editingContent = message.content;
+    this.editingContentBot = message.content;
+  }
+
+  // finishEditing(message: ChatMessage, newContent: string): void {
+  //   if (newContent !== this.originalContent) {
+  //     const botMessageId = this.getBotMessageIdForUserMessage(message.id);
+  //     this.store.dispatch(
+  //       ChatActions.editMessage({
+  //         sessionId: this.currentSessionId,
+  //         userMessageId: message.id,
+  //         botMessageId: botMessageId,
+  //         newContent,
+  //         isEdit: true,
+  //       })
+  //     );
+  //   }
+
+  //   this.editingMessage = null;
+  //   this.originalContent = '';
+  //   this.editingContent = '';
+  // }
+
+  onContentChange() {
+    const textarea: HTMLTextAreaElement = this.autosize.nativeElement;
+    textarea.scrollTop = textarea.scrollHeight;
+  }
+
+  startBotMessageEditing(sessionId: string, message: ChatMessage): void {
+    this.editingMessage = message;
+    this.originalContent = message.content;
+    this.editingContent = message.content;
+    this.editingContentBot = message.content;
   }
 
   finishEditing(message: ChatMessage, newContent: string): void {
-    if (newContent !== this.originalContent) {
+    if (message.sender === 'bot' && newContent !== this.originalContent) {
+      this.store.dispatch(
+        ChatActions.editBotMessage({
+          sessionId: this.currentSessionId,
+          messageId: message.id,
+          newContent: newContent,
+        })
+      );
+    } else if (
+      message.sender === 'user' &&
+      newContent !== this.originalContent
+    ) {
       const botMessageId = this.getBotMessageIdForUserMessage(message.id);
       this.store.dispatch(
         ChatActions.editMessage({
           sessionId: this.currentSessionId,
           userMessageId: message.id,
           botMessageId: botMessageId,
-          newContent,
+          newContent: newContent,
           isEdit: true,
         })
       );
@@ -346,9 +391,13 @@ export class MainComponent implements OnInit, OnDestroy {
     return null;
   }
 
-@HostListener('window:scroll', [])
+  @HostListener('window:scroll', [])
   onWindowScroll(): void {
-    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    const currentScrollTop =
+      window.pageYOffset ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0;
     if (currentScrollTop > this.lastScrollTop) {
       this.showButtons = true;
     } else {

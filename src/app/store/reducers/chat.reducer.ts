@@ -116,5 +116,25 @@ export const chatReducer = createReducer(
 
       return { ...state, sessions };
     }
+  ),
+  on(
+    ChatActions.editBotMessage,
+    (state, { sessionId, messageId, newContent }) => {
+      const sessions = state.sessions.map((session) => {
+        if (session.id === sessionId) {
+          const messages = session.messages.map((message) => {
+            if (message.id === messageId) {
+              return { ...message, content: newContent };
+            }
+            return message;
+          });
+
+          return { ...session, messages };
+        }
+        return session;
+      });
+
+      return { ...state, sessions };
+    }
   )
 );

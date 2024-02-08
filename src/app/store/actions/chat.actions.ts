@@ -30,3 +30,8 @@ export const editMessage = createAction(
     isEdit: boolean;
   }>()
 );
+
+export const editBotMessage = createAction(
+  '[Chat] Edit Bot Message',
+  props<{ sessionId: string; messageId: string; newContent: string }>()
+);

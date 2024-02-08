@@ -28,14 +28,20 @@
                 <mat-spinner diameter="30"></mat-spinner>
                 }
                 @if(message.sender === 'user'){
-                <textarea *ngIf="isEditable(message)" type="text" [(ngModel)]="editingContent" (blur)="onMessageEditDone(message, editingContent)"
-                  (keydown.enter)="onMessageEditEnter(message, editingContent, $event)" class="input-chat-edit"></textarea>
+                <textarea (ngModelChange)="onContentChange()" matInput #autosize="cdkTextareaAutosize" cdkTextareaAutosize cdkAutosizeMinRows="1"
+                  cdkAutosizeMaxRows="30" *ngIf="isEditable(message)" type="text" [(ngModel)]="editingContent"
+                  (blur)="onMessageEditDone(message, editingContent)" (keydown.enter)="onMessageEditEnter(message, editingContent, $event)"
+                  class="input-chat-edit"></textarea>
 
 
                 <p *ngIf="!isEditable(message)" (click)="startEditing(chatSession.id ,message)">{{ message.content }}</p>
                 }
                 @if(message.sender === 'bot'){
-                <p [innerHTML]="sanitizeHTML(message.content)"></p>
+                <textarea matInput #autosize="cdkTextareaAutosize" cdkTextareaAutosize cdkAutosizeMinRows="1" cdkAutosizeMaxRows="30"
+                  *ngIf="isEditable(message)" type="text" [(ngModel)]="editingContentBot" (blur)="onMessageEditDone(message, editingContentBot)"
+                  (keydown.enter)="onMessageEditEnter(message, editingContentBot, $event)" class="input-chat-edit-bot"></textarea>
+
+                <p *ngIf="!isEditable(message)" (click)="startEditing(chatSession.id ,message)">{{message.content }}</p>
                 }
               </div>
 

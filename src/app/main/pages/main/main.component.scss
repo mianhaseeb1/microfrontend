@@ -181,10 +181,22 @@
   background: #f9f9f9;
   outline: none;
   box-shadow: none;
+  overflow-y: hidden;
 }
 
-.bookmark-icon, .notes-icon, .menu-icon{
-  color: #79747E;
+.input-chat-edit-bot {
+  width: 750px;
+  border: none;
+  background: #ffffff;
+  outline: none;
+  box-shadow: none;
+  overflow-y: hidden;
+}
+
+.bookmark-icon,
+.notes-icon,
+.menu-icon {
+  color: #79747e;
 }
 
 .btns-main {
