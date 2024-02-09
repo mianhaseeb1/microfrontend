@@ -96,8 +96,8 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       this.initializeLinks(this.item.links);
     }
 
-    this.saveSubject.pipe(debounceTime(5000)).subscribe(() => {
-      this.onSubmit();
+    this.saveSubject.pipe(debounceTime(3000)).subscribe(() => {
+      this.onEditSubmit();
     });
 
     this.bookmarkService.notebookTitle$.subscribe((update) => {
@@ -113,6 +113,28 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
         this.adjustTextareaHeightOnInit(textareaRef.nativeElement);
       });
     }, 300);
+  }
+
+  onEditSubmit() {
+    const formValue = this.form.value;
+
+    const linkStrings = formValue
+      .links!.map((linkObj) => linkObj.link.trim())
+      .filter((link) => link !== '');
+
+    const isNewBookmark = !this.item || !this.item.id;
+
+    const bookmark: Bookmark = {
+      id: isNewBookmark ? this.generateUniqueId() : this.item.id,
+      title: formValue.title || '',
+      comment: formValue.comment || '',
+      links: linkStrings || [],
+    };
+
+    this.store.dispatch(BookmarkActions.updateBookmark({ bookmark }));
+
+    this.editMode = false;
+    this.addingNewBookmark = false;
   }
 
   onSubmit(): void {
@@ -137,15 +159,11 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       this.form.reset();
       this.editMode = false;
       this.addingNewBookmark = false;
+      this._snackBar.open(MESSAGE.successfully_added_bookmark);
     } else {
       this.store.dispatch(BookmarkActions.updateBookmark({ bookmark }));
+      this._snackBar.open(MESSAGE.successfully_updated_bookmark);
     }
-
-    this._snackBar.open(
-      isNewBookmark
-        ? MESSAGE.successfully_added_bookmark
-        : MESSAGE.successfully_updated_bookmark
-    );
 
     this.requestScroll();
   }
