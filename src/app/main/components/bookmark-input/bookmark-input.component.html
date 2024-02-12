@@ -13,11 +13,7 @@
       <div class="title">
         <div class="form-group">
           <div class="input-group">
-            @if(item){
-            <span class="material-symbols-outlined align-center drag" style="cursor: grab; opacity: 0.4">
-              drag_indicator
-            </span>
-            }
+            <ng-content></ng-content>
             <input type="text" class="form-control" placeholder="Title" formControlName="title" (focus)="enableEditMode()" />
             <div class="input-group-append">
               @if(titleValue != ''){

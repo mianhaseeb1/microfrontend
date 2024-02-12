@@ -23,11 +23,12 @@ import { Store } from '@ngrx/store';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import { v4 as uuidv4 } from 'uuid';
 import { Subject, debounceTime } from 'rxjs';
+import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-bookmark-input',
   standalone: true,
-  imports: [SharedModule, CommonModule],
+  imports: [SharedModule, CommonModule, CdkDropList, CdkDrag],
   templateUrl: './bookmark-input.component.html',
   styleUrl: './bookmark-input.component.scss',
 })
@@ -48,6 +49,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   @Input() item: any;
   @Output() bookmarkAdded = new EventEmitter<string>();
   private saveSubject = new Subject<void>();
+
   constructor(
     private fb: FormBuilder,
     public dialog: MatDialog,
