@@ -168,10 +168,6 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     this.requestScroll();
   }
 
-  triggerSaveOperation(): void {
-    this.saveSubject.next();
-  }
-
   initializeLinks(links: string[]): void {
     const linkFormGroups = links.map((link) => this.fb.group({ link }));
     this.form.setControl('links', this.fb.array(linkFormGroups));
@@ -189,8 +185,25 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   }
 
   enableEditMode(): void {
-    this.editMode = true;
-    this.cdr.detectChanges();
+    if (!this.editMode) {
+      this.editMode = true;
+      const lastLink = this.links.at(this.links.length - 1).value.link.trim();
+      if (lastLink !== '') {
+        this.addLink();
+      }
+
+      this.cdr.detectChanges();
+    }
+  }
+
+  onLinkInputFocus(index: number): void {
+    const isLastInput = index === this.links.length - 1;
+    const lastInputValue = this.links
+      .at(this.links.length - 1)
+      .value.link.trim();
+    if (this.editMode && isLastInput && lastInputValue !== '') {
+      this.addLink();
+    }
   }
 
   disableEditMode(): void {
