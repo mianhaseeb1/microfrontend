@@ -2,9 +2,9 @@
 <div mat-dialog-content>
   <mat-form-field appearance="outline" class="mt-3 full-width">
     <mat-label>Notebook title</mat-label>
-    <input matInput [(ngModel)]="notebookName" />
-    @if(notebookName != ''){
-    <mat-icon matSuffix class="clear-icon pointer" (click)="notebookName = ''">close</mat-icon>}
+    <input matInput [(ngModel)]="data.title" />
+    @if(data.title != ''){
+    <mat-icon matSuffix class="clear-icon pointer" (click)="data.title = ''">close</mat-icon>}
   </mat-form-field>
 </div>
 <div mat-dialog-actions align="end" class="footer">
