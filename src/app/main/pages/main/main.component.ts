@@ -39,6 +39,7 @@ import { ChatMessage, ChatSession } from '../../../store/reducers/chat.reducer';
 import { DomSanitizer } from '@angular/platform-browser';
 import { PagesData } from '../../../models/pages-cards.model';
 import { SharedService } from '../../../services/shared.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-main',
   standalone: true,
@@ -67,7 +68,7 @@ export class MainComponent implements OnInit, OnDestroy {
   notebooks: Notebook[] = [];
   notebooks$!: Observable<Notebook[]>;
   showInput: boolean = false;
-  @ViewChild('mainContainer') private mainContainer!: ElementRef;
+  @ViewChild('chatContainer') private mainContainer!: ElementRef;
   chatSessions: ChatSession[] = [];
   currentSessionId: string = '';
   chatSessions$!: Observable<ChatSession[]>;
@@ -80,6 +81,7 @@ export class MainComponent implements OnInit, OnDestroy {
   showButtons: boolean = true;
   lastScrollTop: number = 0;
   editingContentBot: string = '';
+  private lastDeletedSession: ChatSession | null = null;
 
   constructor(
     private bookmarkService: BookmarkService,
@@ -87,7 +89,8 @@ export class MainComponent implements OnInit, OnDestroy {
     public store: Store,
     private sharedService: SharedService,
     private sanitizer: DomSanitizer,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private _snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -134,6 +137,11 @@ export class MainComponent implements OnInit, OnDestroy {
     });
   }
 
+  private scrollToBottom(): void {
+    this.mainContainer.nativeElement.scrollTop =
+      this.mainContainer.nativeElement.scrollHeight;
+  }
+
   scrollMainContainerToBottom(): void {
     setTimeout(() => {
       const scrollContainer = this.mainContainer.nativeElement;
@@ -166,6 +174,38 @@ export class MainComponent implements OnInit, OnDestroy {
     this.store.dispatch(BookmarkActions.loadBookmarks());
   }
 
+  delete(sessionId: string) {
+    const sessionToDelete = this.chatSessions.find(
+      (session) => session.id === sessionId
+    );
+    if (sessionToDelete) {
+      this.lastDeletedSession = sessionToDelete;
+      this.store.dispatch(ChatActions.deleteChatSession({ sessionId }));
+      this.showUndoSnackbar();
+    }
+  }
+
+  private showUndoSnackbar() {
+    const snackBarRef = this._snackBar.open('Chat session deleted', 'UNDO', {
+      duration: 5000,
+    });
+
+    snackBarRef.onAction().subscribe(() => {
+      if (this.lastDeletedSession) {
+        this.store.dispatch(
+          ChatActions.undoDeleteChatSession({
+            session: this.lastDeletedSession,
+          })
+        );
+        this.lastDeletedSession = null;
+      }
+    });
+
+    snackBarRef.afterDismissed().subscribe(() => {
+      this.lastDeletedSession = null;
+    });
+  }
+
   toggleChat() {
     this.showInput = !this.showInput;
     this.scrollToBottom();
@@ -194,11 +234,11 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   startNewChatSession() {
-    this.scrollMainContainerToBottom();
     const newSessionId = uuidv4();
     this.store.dispatch(
       ChatActions.startNewSession({ sessionId: newSessionId })
     );
+    setTimeout(() => this.scrollToBottom(), 100);
     this.currentSessionId = newSessionId;
   }
 
@@ -236,6 +276,7 @@ export class MainComponent implements OnInit, OnDestroy {
         })
       );
     }
+    setTimeout(() => this.scrollToBottom(), 100);
   }
 
   isSessionEnded(sessionId: string): boolean {
@@ -246,6 +287,7 @@ export class MainComponent implements OnInit, OnDestroy {
       .subscribe((session) => {
         isEnded = session ? session.ended : true;
       });
+    setTimeout(() => this.scrollToBottom(), 100);
     return isEnded;
   }
 
@@ -285,12 +327,12 @@ export class MainComponent implements OnInit, OnDestroy {
     });
   }
 
-  scrollToBottom() {
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: 'smooth',
-    });
-  }
+  // scrollToBottom() {
+  //   window.scrollTo({
+  //     top: document.body.scrollHeight,
+  //     behavior: 'smooth',
+  //   });
+  // }
 
   sanitizeHTML(htmlContent: string) {
     return this.sanitizer.bypassSecurityTrustHtml(htmlContent);
@@ -379,6 +421,7 @@ export class MainComponent implements OnInit, OnDestroy {
     this.editingMessage = null;
     this.originalContent = '';
     this.editingContent = '';
+    setTimeout(() => this.scrollToBottom(), 100);
   }
 
   private getBotMessageIdForUserMessage(userMessageId: string): string | null {
@@ -395,7 +438,7 @@ export class MainComponent implements OnInit, OnDestroy {
         }
       }
     }
-
+    setTimeout(() => this.scrollToBottom(), 100);
     return null;
   }
 

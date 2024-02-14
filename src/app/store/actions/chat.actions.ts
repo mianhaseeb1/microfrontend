@@ -1,4 +1,5 @@
 import { createAction, props } from '@ngrx/store';
+import { ChatSession } from '../reducers/chat.reducer';
 
 export const sendMessage = createAction(
   '[Chat] Send Message',
@@ -34,4 +35,14 @@ export const editMessage = createAction(
 export const editBotMessage = createAction(
   '[Chat] Edit Bot Message',
   props<{ sessionId: string; messageId: string; newContent: string }>()
+);
+
+export const deleteChatSession = createAction(
+  '[Chat] Delete Chat Session',
+  props<{ sessionId: string }>()
+);
+
+export const undoDeleteChatSession = createAction(
+  '[Chat] Undo Delete Chat Session',
+  props<{ session: ChatSession }>()
 );
