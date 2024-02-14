@@ -23,15 +23,18 @@ export class HomeMainContentComponent implements OnInit {
   cardItems$: Observable<IPagesCards> = this.store.select(selectAllPages);
   pageError$: Observable<string> = this.store.select(selectPageError);
 
-  constructor(private store: Store, private router: Router, private sharedService: SharedService) {}
+  constructor(
+    private store: Store,
+    private router: Router,
+    private sharedService: SharedService
+  ) {}
 
   ngOnInit() {
     this.store.dispatch(loadPages({ userId: 1 }));
   }
 
-  selectNotebook(item: PagesData){
+  selectNotebook(item: PagesData) {
     this.sharedService.updateData(item);
-    this.router.navigate(['/main'])
-    
+    this.router.navigate(['/main'], { queryParams: { title: item.title } });
   }
 }

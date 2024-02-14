@@ -1,14 +1,13 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { Bookmark } from '../models/bookmark.model';
 import { Observable, Subject, of } from 'rxjs';
-import { BOOKMARK_DATA } from '../data/bookmark.data';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BookmarkService {
-  private bookmarks: Bookmark[] = BOOKMARK_DATA;
+  private bookmarks: Bookmark[] = [];
 
   private notebookTitleSource = new Subject<{ id: string; newTitle: string }>();
 

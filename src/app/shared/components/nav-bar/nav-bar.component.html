@@ -1,6 +1,5 @@
 <div class="main-toolbar">
   <mat-toolbar>
-
     <div class="flex">
       <div class="sales-proposal align-center pointer" routerLink="/home">
         <div class="header align-center">
@@ -9,9 +8,9 @@
           </div>
         </div>
       </div>
-      <ng-container *ngIf="item$ | async as item">
-        <div class="title-res align-center">
-          <div class="input-group custom-input-group pointer" routerLink="/home">
+      <ng-container *ngIf="item$ | async as item; else simpleTitle">
+        <div class="title-res align-center" (click)="updateTitle(item.title)">
+          <div class="input-group custom-input-group pointer">
             <p>{{item.title}}</p>
             <div class="input-group-append">
               <span class="input-group-text" id="basic-addon2"><i class="edit-icon fas fa-edit"></i></span>
@@ -19,6 +18,16 @@
           </div>
         </div>
       </ng-container>
+      <ng-template #simpleTitle>
+        <div class="title-res align-center" *ngIf="title" (click)="updateTitle(title)">
+          <div class="input-group custom-input-group pointer">
+            <p>{{title}}</p>
+            <div class="input-group-append">
+              <span class="input-group-text" id="basic-addon2"><i class="edit-icon fas fa-edit"></i></span>
+            </div>
+          </div>
+        </div>
+      </ng-template>
       <div class="profile-side">
         <div class="profile">
           <div class="image">
@@ -29,6 +38,5 @@
         </div>
       </div>
     </div>
-
   </mat-toolbar>
 </div>

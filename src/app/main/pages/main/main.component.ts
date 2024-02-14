@@ -19,7 +19,7 @@ import { CommonModule } from '@angular/common';
 import { BookmarkInputComponent } from '../../components/bookmark-input/bookmark-input.component';
 import { NavBarComponent } from '../../../shared/components/nav-bar/nav-bar.component';
 import { BookmarkService } from '../../../services/bookmark.service';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { EditorService } from '../../../services/ckeditor.service';
 import InlineEditor from '@ckeditor/ckeditor5-build-inline';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
@@ -86,7 +86,8 @@ export class MainComponent implements OnInit, OnDestroy {
     private editorService: EditorService,
     public store: Store,
     private sharedService: SharedService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -101,6 +102,13 @@ export class MainComponent implements OnInit, OnDestroy {
       .subscribe((sessions) => {
         this.chatSessions = sessions;
       });
+
+    this.activatedRoute.queryParams.subscribe((params) => {
+      const title = params['title'];
+      if (title) {
+        this.sharedService.updateTitle(title);
+      }
+    });
 
     this.currentSessionMessages$ = this.store.select(
       ChatSelectors.selectMessagesFromSession(this.currentSessionId)
