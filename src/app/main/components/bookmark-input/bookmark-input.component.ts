@@ -23,11 +23,12 @@ import { Store } from '@ngrx/store';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import { v4 as uuidv4 } from 'uuid';
 import { Subject, debounceTime } from 'rxjs';
+import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-bookmark-input',
   standalone: true,
-  imports: [SharedModule, CommonModule],
+  imports: [SharedModule, CommonModule, CdkDropList, CdkDrag],
   templateUrl: './bookmark-input.component.html',
   styleUrl: './bookmark-input.component.scss',
 })
@@ -48,6 +49,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   @Input() item: any;
   @Output() bookmarkAdded = new EventEmitter<string>();
   private saveSubject = new Subject<void>();
+
   constructor(
     private fb: FormBuilder,
     public dialog: MatDialog,
@@ -168,10 +170,6 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     this.requestScroll();
   }
 
-  triggerSaveOperation(): void {
-    this.saveSubject.next();
-  }
-
   initializeLinks(links: string[]): void {
     const linkFormGroups = links.map((link) => this.fb.group({ link }));
     this.form.setControl('links', this.fb.array(linkFormGroups));
@@ -189,8 +187,25 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   }
 
   enableEditMode(): void {
-    this.editMode = true;
-    this.cdr.detectChanges();
+    if (!this.editMode) {
+      this.editMode = true;
+      const lastLink = this.links.at(this.links.length - 1).value.link.trim();
+      if (lastLink !== '') {
+        this.addLink();
+      }
+
+      this.cdr.detectChanges();
+    }
+  }
+
+  onLinkInputFocus(index: number): void {
+    const isLastInput = index === this.links.length - 1;
+    const lastInputValue = this.links
+      .at(this.links.length - 1)
+      .value.link.trim();
+    if (this.editMode && isLastInput && lastInputValue !== '') {
+      this.addLink();
+    }
   }
 
   disableEditMode(): void {
@@ -231,8 +246,10 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   }
 
   adjustTextareaHeightOnInit(textarea: HTMLTextAreaElement): void {
-    textarea.style.height = 'auto';
-    textarea.style.height = `${textarea.scrollHeight}px`;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
   }
 
   createLink(): FormGroup {

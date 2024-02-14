@@ -1,4 +1,4 @@
-<form [formGroup]="form">
+<form [formGroup]="form" [ngClass]="{ 'active-wrapper': editMode }">
   <div class="flex-bookmark">
     <div class="hover-icons">
       <div class="main">
@@ -13,13 +13,8 @@
       <div class="title">
         <div class="form-group">
           <div class="input-group">
-            @if(item){
-            <span class="material-symbols-outlined align-center drag" style="cursor: grab; opacity: 0.4">
-              drag_indicator
-            </span>
-            }
-            <input type="text" class="form-control" placeholder="Title" formControlName="title" (focus)="enableEditMode()"
-              (blur)="triggerSaveOperation()" />
+            <ng-content></ng-content>
+            <input type="text" class="form-control" placeholder="Title" formControlName="title" (focus)="enableEditMode()" />
             <div class="input-group-append">
               @if(titleValue != ''){
               <span class="input-group-text pointer material-icons" (click)="titleValue = ''">
@@ -40,7 +35,7 @@
             <div class="input-group">
               <span class="input-group-text material-symbols-outlined left-span">{{ linkFormGroup.get("link")!.value ? "link" : "add" }}</span>
               <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
-                (focus)="enableEditMode()" (blur)="triggerSaveOperation()" />
+                (focus)="enableEditMode()" />
               @if(editMode){
               <span class="input-group-text material-symbols-outlined pointer right-span remove-icon"
                 *ngIf="links.length > 1 && !(isLast && linkFormGroup.get('link')!.value.trim() === '')" (click)="removeLink(i)">
@@ -52,10 +47,10 @@
       </div>
       <div class="textarea">
         <textarea #textarea placeholder="Add comments" formControlName="comment" (input)="adjustTextareaHeight($event)" rows="1"
-          (focus)="enableEditMode()" (blur)="triggerSaveOperation()"></textarea>
+          (focus)="enableEditMode(); "></textarea>
         @if(!item || editMode){
         <div class="btn-div">
-          <button (click)="onSubmit()" mat-button class="input-button">
+          <button (click)="!editMode ? onSubmit() : onEditSubmit()" mat-button class="input-button">
             Done
           </button>
         </div>

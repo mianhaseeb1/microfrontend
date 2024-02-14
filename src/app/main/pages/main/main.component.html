@@ -2,9 +2,15 @@
 <div class="main" #mainContainer>
   <div cdkDropList #bookmarkList="cdkDropList" [cdkDropListData]="items" [cdkDropListConnectedTo]="[notebookList, chatList]" class="bookmark-list"
     (cdkDropListDropped)="drop($event)">
-    <div *ngFor="let item of items$ | async; let i = index" class="bookmark-item mt-4" cdkDrag>
+    <div *ngFor="let item of items$ | async; let i = index" cdkDrag class="bookmark-item mt-4">
       <div>
-        <app-bookmark-input [item]="item" (scrollRequest)="scrollMainContainerToBottom()"></app-bookmark-input>
+        <app-bookmark-input [item]="item" (scrollRequest)="scrollMainContainerToBottom()">
+          <div cdkDragHandle>
+            <span class="material-symbols-outlined align-center drag" style="cursor: grab; opacity: 0.4">
+              drag_indicator
+            </span>
+          </div>
+        </app-bookmark-input>
       </div>
     </div>
   </div>
