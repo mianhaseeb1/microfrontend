@@ -2,18 +2,20 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { Bookmark } from '../models/bookmark.model';
 import { Observable, Subject, of } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BookmarkService {
   private bookmarks: Bookmark[] = [];
-
   private notebookTitleSource = new Subject<{ id: string; newTitle: string }>();
-
   notebookTitle$ = this.notebookTitleSource.asObservable();
-
   onBookmarkDeleted = new EventEmitter<void>();
+  private apiUrl: string = 'https://api.linkpreview.net';
+
+  constructor(private http: HttpClient) {}
 
   updateNotebookTitle(update: { id: string; newTitle: string }) {
     this.notebookTitleSource.next(update);
@@ -45,5 +47,13 @@ export class BookmarkService {
     } else {
       return of({ success: false, message: 'Bookmark not found.' });
     }
+  }
+
+  getLinkPreview(url: string): Observable<any> {
+    return this.http.get<any>(
+      `${this.apiUrl}?key=${
+        environment.linkPreviewApiKey
+      }&q=${encodeURIComponent(url)}`
+    );
   }
 }

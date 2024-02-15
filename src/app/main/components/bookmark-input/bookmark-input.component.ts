@@ -15,7 +15,7 @@ import { SharedModule } from '../../../shared/shared.module';
 import { CommonModule } from '@angular/common';
 import { EditNotebookComponent } from '../../dialogs/edit-notebook/edit-notebook.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Bookmark } from '../../../models/bookmark.model';
+import { Bookmark, BookmarkLink } from '../../../models/bookmark.model';
 import { BookmarkService } from '../../../services/bookmark.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MESSAGE } from '../../../utils/MESSAGES';
@@ -34,19 +34,14 @@ import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 })
 export class BookmarkInputComponent implements OnInit, AfterViewInit {
   titleValue: string = '';
-  navTitle: string = 'New Page';
   inputValue: string = '';
   editMode: boolean = false;
   addingNewBookmark: boolean = false;
   lastDeletedItem: Bookmark | null = null;
-  form = this.fb.group({
-    title: ['', Validators.required],
-    comment: [''],
-    links: this.fb.array([this.createLink()]),
-  });
+  form: FormGroup;
   @Output() scrollRequest = new EventEmitter<void>();
   @ViewChildren('textarea') textareas!: QueryList<ElementRef>;
-  @Input() item: any;
+  @Input() item!: Bookmark;
   @Output() bookmarkAdded = new EventEmitter<string>();
   private saveSubject = new Subject<void>();
 
@@ -57,7 +52,13 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef,
     private _snackBar: MatSnackBar,
     private store: Store
-  ) {}
+  ) {
+    this.form = this.fb.group({
+      title: ['', Validators.required],
+      comment: [''],
+      links: this.fb.array([this.createLink()]),
+    });
+  }
 
   edit(bookmarkId: string): void {
     this.dialog.open(EditNotebookComponent, {
@@ -83,8 +84,17 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       this.form.patchValue({
         title: this.item.title,
         comment: this.item.comment || '',
-        links: this.item.links || [],
       });
+
+      const linksFormGroups = this.item.links.map((link) =>
+        this.fb.group({
+          link: [link.link, Validators.required],
+          image: [link.image],
+        })
+      );
+      const linksFormArray = this.fb.array(linksFormGroups);
+      this.form.setControl('links', linksFormArray);
+
       if (this.item.editMode && this.item.title == '') {
         this.enableEditMode();
       }
@@ -117,12 +127,21 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     }, 300);
   }
 
+  clearTitle() {
+    this.form.get('title')!.setValue('');
+  }
+
   onEditSubmit() {
     const formValue = this.form.value;
 
-    const linkStrings = formValue
-      .links!.map((linkObj) => linkObj.link.trim())
-      .filter((link) => link !== '');
+    const linksObjects = formValue
+      .links!.map((linkObj: any) => ({
+        link: linkObj.link.trim(),
+        image: linkObj.image || '',
+      }))
+      .filter((linkObj: any) => linkObj.link !== '');
+
+    console.log(linksObjects);
 
     const isNewBookmark = !this.item || !this.item.id;
 
@@ -130,8 +149,10 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       id: isNewBookmark ? this.generateUniqueId() : this.item.id,
       title: formValue.title || '',
       comment: formValue.comment || '',
-      links: linkStrings || [],
+      links: linksObjects || [],
     };
+
+    console.log(bookmark);
 
     this.store.dispatch(BookmarkActions.updateBookmark({ bookmark }));
 
@@ -142,9 +163,14 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   onSubmit(): void {
     this.requestScroll();
     const formValue = this.form.value;
-    const linkStrings = formValue
-      .links!.map((linkObj) => linkObj.link.trim())
-      .filter((link) => link !== '');
+    const linksObjects = formValue
+      .links!.map((linkObj: any) => ({
+        link: linkObj.link.trim(),
+        image: linkObj.image || '',
+      }))
+      .filter((linkObj: any) => linkObj.link !== '');
+
+    console.log(linksObjects);
 
     const isNewBookmark = !this.item || !this.item.id;
 
@@ -152,7 +178,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       id: isNewBookmark ? this.generateUniqueId() : this.item.id,
       title: formValue.title || '',
       comment: formValue.comment || '',
-      links: linkStrings || [],
+      links: linksObjects || [],
     };
 
     if (isNewBookmark) {
@@ -170,8 +196,10 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     this.requestScroll();
   }
 
-  initializeLinks(links: string[]): void {
-    const linkFormGroups = links.map((link) => this.fb.group({ link }));
+  initializeLinks(links: BookmarkLink[]): void {
+    const linkFormGroups = links.map((item) =>
+      this.fb.group({ link: item.link, image: item.image })
+    );
     this.form.setControl('links', this.fb.array(linkFormGroups));
   }
 
@@ -190,6 +218,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     if (!this.editMode) {
       this.editMode = true;
       const lastLink = this.links.at(this.links.length - 1).value.link.trim();
+
       if (lastLink !== '') {
         this.addLink();
       }
@@ -212,15 +241,18 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     const formValue = this.form.value;
     const linkInputs = formValue.links || [];
 
-    const linkStrings = linkInputs
-      .map((linkObj: { link: string }) => linkObj.link.trim())
-      .filter((link: string) => link !== '');
+    const linksObjects = formValue
+      .links!.map((linkObj: any) => ({
+        link: linkObj.link.trim(),
+        image: linkObj.image || '',
+      }))
+      .filter((linkObj: any) => linkObj.link !== '');
 
     const updatedBookmark: Bookmark = {
       ...this.item,
       title: formValue.title || '',
       comment: formValue.comment || '',
-      links: linkStrings,
+      links: linksObjects,
       editMode: false,
     };
 
@@ -252,12 +284,6 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     }
   }
 
-  createLink(): FormGroup {
-    return this.fb.group({
-      link: [''],
-    });
-  }
-
   addLink(): void {
     this.requestScroll();
     this.links.push(this.createLink());
@@ -276,21 +302,37 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   }
 
   onInput(index: number): void {
-    const currentInput = this.links.at(index).value.link;
-    const isLastInput = index === this.links.length - 1;
+    const linkFormGroup = this.links.at(index) as FormGroup;
+    const url = linkFormGroup.get('link')!.value.trim();
+    if (url) {
+      this.bookmarkService.getLinkPreview(url).subscribe({
+        next: (data) => {
+          if (data) {
+            if (data.image) {
+              linkFormGroup.get('image')?.patchValue(data.image);
+            }
 
-    if (isLastInput && currentInput.trim() !== '') {
-      this.addLink();
-    } else if (!isLastInput && currentInput.trim() === '') {
-      const nextInput = this.links.at(index + 1);
-      if (
-        nextInput &&
-        nextInput.value.link.trim() !== '' &&
-        this.links.length > 2
-      ) {
-        this.removeLink(index);
-      }
+            linkFormGroup.patchValue({
+              link: data.title,
+              image: data.image,
+            });
+            this.cdr.detectChanges();
+          }
+        },
+        error: (error) => console.error('Error fetching link preview:', error),
+      });
     }
+
+    if (index === this.links.length - 1 && url) {
+      this.addLink();
+    }
+  }
+
+  createLink(): FormGroup {
+    return this.fb.group({
+      link: ['', Validators.required],
+      image: [''],
+    });
   }
 
   delete(id: string) {

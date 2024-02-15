@@ -16,8 +16,8 @@
             <ng-content></ng-content>
             <input type="text" class="form-control" placeholder="Title" formControlName="title" (focus)="enableEditMode()" />
             <div class="input-group-append">
-              @if(titleValue != ''){
-              <span class="input-group-text pointer material-icons" (click)="titleValue = ''">
+              @if(form.get('title')!.value){
+              <span class="input-group-text pointer material-icons" (click)="clearTitle()">
                 close
               </span>
               }
@@ -33,9 +33,15 @@
               let isLast = last
             " [formGroupName]="i">
             <div class="input-group">
-              <span class="input-group-text material-symbols-outlined left-span">{{ linkFormGroup.get("link")!.value ? "link" : "add" }}</span>
+              <span *ngIf="!linkFormGroup.get('image')?.value" class="input-group-text material-symbols-outlined left-span">{{
+                linkFormGroup.get("link")!.value ? "link" : "add" }}</span>
+              <span class="left-span" *ngIf="linkFormGroup.get('image')?.value">
+                <img height="20px" [src]="linkFormGroup.get('image')?.value" class="link-image" alt="Link preview image">
+              </span>
               <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
-                (focus)="enableEditMode()" />
+                (focus)="enableEditMode()">
+              <!-- <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
+                (focus)="enableEditMode()" /> -->
               @if(editMode){
               <span class="input-group-text material-symbols-outlined pointer right-span remove-icon"
                 *ngIf="links.length > 1 && !(isLast && linkFormGroup.get('link')!.value.trim() === '')" (click)="removeLink(i)">

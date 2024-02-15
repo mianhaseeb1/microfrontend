@@ -136,5 +136,13 @@ export const chatReducer = createReducer(
 
       return { ...state, sessions };
     }
-  )
+  ),
+  on(ChatActions.deleteChatSession, (state, { sessionId }) => ({
+    ...state,
+    sessions: state.sessions.filter((session) => session.id !== sessionId),
+  })),
+  on(ChatActions.undoDeleteChatSession, (state, { session }) => ({
+    ...state,
+    sessions: [...state.sessions, session],
+  }))
 );
