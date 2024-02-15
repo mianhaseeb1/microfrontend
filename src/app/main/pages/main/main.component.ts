@@ -249,7 +249,7 @@ export class MainComponent implements OnInit, OnDestroy {
       id: this.generateUniqueId(),
       title: '',
       comment: '',
-      links: [''],
+      links: [{ link: '', image: '' }],
       editMode: true,
     };
     this.store.dispatch(BookmarkActions.addBookmark({ bookmark: newBookmark }));
