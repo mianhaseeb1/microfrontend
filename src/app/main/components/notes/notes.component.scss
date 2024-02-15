@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   .content {
-    box-shadow: 0 0 5px #9a9a9a;
+    box-shadow: 0 1px 3px 1px rgba(88, 88, 88, 0.15);
     padding: 20px;
     border-radius: 16px;
     min-height: 195px;
@@ -27,7 +27,7 @@
     left: 0;
     top: 0;
     .main {
-      box-shadow: 0 0 5px #8d8d8d;
+      box-shadow: 0 1px 3px 1px rgba(88, 88, 88, 0.15);
       border-radius: 25px;
       padding: 11px 6px;
       display: flex;

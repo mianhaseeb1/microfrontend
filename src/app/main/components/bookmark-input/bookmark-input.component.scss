@@ -24,20 +24,35 @@
     display: none;
     transition: all 0.5s;
     position: absolute;
-    left: 0;
-    top: 0;
+    left: 8px;
+    top: 10px;
     z-index: 1004;
+    width: 28px;
     .main {
-      box-shadow: 0 0 5px #8d8d8d;
-      border-radius: 25px;
-      padding: 11px 6px;
+      width: 28px;
+      box-shadow: 0 1px 3px 1px rgba(88, 88, 88, 0.15);
+      border-radius: 7px;
       display: flex;
       flex-direction: column;
       gap: 8px;
       align-items: center;
+      padding-bottom: 4px;
+      .bookmark-hover-icon {
+        background: #eaf1ff;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
+        border-top-left-radius: 7px;
+        border-top-right-radius: 7px;
+        span {
+          color: #0a3485;
+        }
+      }
       span {
-        color: #1457d9;
-        font-size: 21px;
+        font-size: 17px;
+        color: #8d8d8d;
       }
     }
   }

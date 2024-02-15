@@ -68,26 +68,27 @@
   </div>
   <div [class.hidden]="!showInput && !showButtons" class="btns-main justify-center gap-15" *ngIf="!showInput && showButtons">
     <div class="btns">
-      <div class="web-bookmark-btn">
-        <button mat-icon-button matTooltip="Add Web Bookmarks" matTooltipPosition="above" (click)="addNewBookmark()">
-          <span class="material-symbols-outlined bookmark-icon"> bookmark </span>
+      <div class="web-bookmark-btn align-center ">
+        <button class="flex" matTooltip="Add Web Bookmarks" matTooltipPosition="above" (click)="addNewBookmark()">
+          <span class="material-symbols-outlined bookmark-icon flex"> bookmark </span>
         </button>
       </div>
-      <div class="notes-btn">
-        <button mat-icon-button matTooltip="Add Notes" matTooltipPosition="above" (click)="addNewNotebook()">
-          <span class="material-symbols-outlined notes-icon"> add_notes </span>
+      <div class="notes-btn align-center ">
+        <button class="flex" matTooltip="Add Notes" matTooltipPosition="above" (click)="addNewNotebook()">
+          <span class="material-symbols-outlined notes-icon flex"> add_notes </span>
         </button>
       </div>
-    </div>
-    <div class="chat-btn">
-      <button mat-icon-button matTooltip="New Chat" matTooltipPosition="above" (click)="toggleChat()">
-        <img src="/assets/icons/ai.svg" alt="">
-      </button>
-    </div>
-    <div class="menu-btn">
-      <button mat-icon-button matTooltip="More items" matTooltipPosition="above">
-        <span class="material-symbols-outlined menu-icon"> more_vert </span>
-      </button>
+
+      <div class="chat-btn align-center ">
+        <button class="flex" matTooltip="New Chat" matTooltipPosition="above" (click)="toggleChat()">
+          <img src="/assets/icons/ai.svg" class="flex" alt="">
+        </button>
+      </div>
+      <div class="menu-btn align-center ">
+        <button matTooltip="More items" matTooltipPosition="above" class="flex">
+          <span class="material-symbols-outlined menu-icon flex"> more_vert </span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

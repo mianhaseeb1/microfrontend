@@ -8,20 +8,36 @@
   overflow-y: auto;
   .btns-main {
     position: fixed;
-    bottom: 15px;
+    bottom: 20px;
     display: flex;
     align-items: center;
     padding: 5px;
     margin-top: 15px;
     gap: 5px;
     background: #ffffff;
-    width: auto;
-    box-shadow: 0 0 4px #ccc;
-    border-radius: 6px;
+    width: 195px;
+    box-shadow: 0 1px 3px 1px rgba(88, 88, 88, 0.15);
+    border-radius: 50px;
+    height: 41px;
     .btns {
       display: flex;
-      gap: 5px;
+      width: 100%;
+      justify-content: space-evenly;
+      button {
+        background: transparent;
+        border: none;
+        display: flex;
+      }
     }
+  }
+}
+
+.chat-btn,
+.menu-btn {
+  button {
+    background: transparent;
+    border: none;
+    display: flex;
   }
 }
 
@@ -57,7 +73,7 @@
   transform: translateX(-50%);
   bottom: 30px;
   z-index: 1000;
-  box-shadow: 0 0 5px #ccc;
+  box-shadow: 0 1px 3px 1px rgba(88, 88, 88, 0.15);
   .send-btn {
     display: flex;
     justify-content: flex-end;
@@ -98,7 +114,7 @@
 
 .messages {
   background-color: #ffffff;
-  box-shadow: 0 0 5px #9a9a9a;
+  box-shadow: 0 1px 3px 1px rgba(88, 88, 88, 0.15);
   width: 800px;
   border-radius: 16px;
   min-height: 195px;
@@ -150,7 +166,7 @@
   right: -30px;
   top: -30px;
   background: white;
-  box-shadow: 0 0 4px #ccc;
+  box-shadow: 0 1px 3px 1px rgba(88, 88, 88, 0.15);
 }
 
 .scroll-btn {
@@ -230,7 +246,7 @@
     z-index: 1004;
     .main {
       height: 55px;
-      box-shadow: 0 0 5px #8d8d8d;
+      box-shadow: 0 1px 3px 1px rgba(88, 88, 88, 0.15);
       border-radius: 25px;
       padding: 11px 6px;
       display: flex;
