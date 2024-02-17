@@ -27,10 +27,29 @@
             <input type="text" class="form-control" placeholder="Title" formControlName="title" (focus)="enableEditMode()" />
             <div class="input-group-append">
               @if(form.get('title')!.value){
-              <span class="input-group-text pointer material-icons" (click)="clearTitle()">
+              <span class="input-group-text pointer material-icons x-title" (click)="clearTitle()">
                 close
               </span>
               }
+              <span [matMenuTriggerFor]="bookmarkMenu" class="input-group-text pointer material-icons menu-title">
+                more_vert
+              </span>
+              <mat-menu #bookmarkMenu="matMenu">
+                <button mat-menu-item class="align-center" (click)="enableEditMode()">
+                  <span class="material-symbols-outlined"> border_color </span>
+                  <span>Edit</span>
+                </button>
+
+                <button mat-menu-item class="align-center">
+                  <span class="material-symbols-outlined"> visibility </span>
+                  <span>View</span>
+                </button>
+
+                <button mat-menu-item class="align-center" (click)="delete(item.id)">
+                  <span class="material-symbols-outlined"> delete </span>
+                  <span>Remove</span>
+                </button>
+              </mat-menu>
             </div>
           </div>
         </div>

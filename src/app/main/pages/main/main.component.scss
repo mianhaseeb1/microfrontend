@@ -71,8 +71,9 @@
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 30px;
+  bottom: 85px;
   z-index: 1000;
+  width: 670px !important;
   box-shadow: 0 1px 3px 1px rgba(88, 88, 88, 0.15);
   .send-btn {
     display: flex;
@@ -87,7 +88,7 @@
 
 .chat-input mat-form-field {
   transition: width 0.5s ease-in-out;
-  width: 0;
+  width: 670px !important;
   background: #ffffff;
 }
 

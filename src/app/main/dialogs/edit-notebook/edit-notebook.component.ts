@@ -24,16 +24,14 @@ export class EditNotebookComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (this.data && this.data.title) {
-      this.notebookName = this.data.title;
-    }
+    this.notebookName = this.data.title;
   }
 
   save(): void {
     this.store.dispatch(
-      PagesActions.createPage({ page: { title: this.data.title, userId: 1 } })
+      PagesActions.createPage({ page: { title: this.notebookName, userId: 1 } })
     );
-    this.sharedService.updateTitle(this.data.title);
-    this.dialogRef.close(this.data.title);
+    this.sharedService.updateTitle(this.notebookName);
+    this.dialogRef.close(this.notebookName);
   }
 }

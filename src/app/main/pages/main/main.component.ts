@@ -223,13 +223,11 @@ export class MainComponent implements OnInit, OnDestroy {
         document
           .querySelector('.chat-input mat-form-field')!
           .classList.add('active');
-        document.querySelector('.btns')!.classList.add('hidden');
       }, 10);
     } else {
       document
         .querySelector('.chat-input mat-form-field')!
         .classList.remove('active');
-      document.querySelector('.btns')!.classList.remove('hidden');
     }
   }
 
