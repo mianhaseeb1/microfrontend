@@ -79,6 +79,10 @@ body {
   --mdc-outlined-text-field-container-shape: 28px !important;
 }
 
+.mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
 #search .mat-mdc-form-field-icon-suffix,
 [dir="rtl"] .mat-mdc-form-field-icon-prefix {
   margin-right: 20px !important;

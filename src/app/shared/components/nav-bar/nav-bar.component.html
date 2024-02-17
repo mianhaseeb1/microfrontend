@@ -4,6 +4,7 @@
       <div class="sales-proposal align-center pointer" routerLink="/home">
         <div class="header align-center">
           <div class="icon">
+
             <img src="/assets/images/logo.svg" width="30px" alt="" />
           </div>
         </div>
@@ -32,7 +33,37 @@
         <div class="profile">
           <div class="image">
             <div class="pic pointer">
-              <img src="/assets/images/profile_pic.png" alt="" />
+              <span [matMenuTriggerFor]="navMenu" class="material-symbols-outlined menu-icon pointer">
+                menu
+              </span>
+              <img [matMenuTriggerFor]="navMenu" src="/assets/images/profile_pic.png" class="profile-pic " alt="" />
+              <mat-menu #navMenu="matMenu">
+                <button mat-menu-item class="align-center">
+                  <span class="material-symbols-outlined"> settings </span>
+                  <span>Channel Membership</span>
+                </button>
+
+                <button mat-menu-item class="align-center">
+                  <span class="material-symbols-outlined">
+                    person_add
+                  </span>
+                  <span>Invite Colleagues</span>
+                </button>
+
+                <button mat-menu-item class="align-center">
+                  <span class="material-symbols-outlined">
+                    playlist_add_check
+                  </span>
+                  <span>My Channels</span>
+                </button>
+
+                <button mat-menu-item class="align-center">
+                  <span class="material-symbols-outlined">
+                    logout
+                  </span>
+                  <span>Sign out</span>
+                </button>
+              </mat-menu>
             </div>
           </div>
         </div>
