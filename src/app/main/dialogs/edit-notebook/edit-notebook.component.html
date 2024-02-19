@@ -1,15 +1,17 @@
-<h1 mat-dialog-title>Add notebook name</h1>
-<div mat-dialog-content>
-  <mat-form-field appearance="outline" class="mt-3 full-width">
-    <mat-label>Notebook title</mat-label>
-    <input matInput [(ngModel)]="notebookName" />
-    @if(notebookName != ''){
-    <mat-icon matSuffix class="clear-icon pointer" (click)="notebookName = ''">close</mat-icon>}
-  </mat-form-field>
-</div>
-<div mat-dialog-actions align="end" class="footer">
-  <button mat-button mat-dialog-close class="cancel-btn">Cancel</button>
-  <button mat-button [mat-dialog-close]="true" class="save-btn" (click)="save()">
-    Save
-  </button>
-</div>
+<form action="">
+  <h1 mat-dialog-title>Add notebook name</h1>
+  <div mat-dialog-content>
+    <mat-form-field appearance="outline" class="mt-3 full-width">
+      <mat-label>Notebook title</mat-label>
+      <input matInput [(ngModel)]="notebookName" name="notebookName" />
+
+      <!-- <mat-icon matSuffix class="clear-icon pointer" (click)="data.title = ''">close</mat-icon> -->
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions align="end" class="footer">
+    <button mat-button mat-dialog-close class="cancel-btn m-1">Cancel</button>
+    <button mat-button [mat-dialog-close]="true" class="save-btn m-1" (click)="save()">
+      Save
+    </button>
+  </div>
+</form>

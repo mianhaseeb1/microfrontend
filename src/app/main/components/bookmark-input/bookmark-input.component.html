@@ -1,10 +1,20 @@
-<form [formGroup]="form">
+<form [formGroup]="form" [ngClass]="{ 'active-wrapper': editMode }">
   <div class="flex-bookmark">
     <div class="hover-icons">
       <div class="main">
-        <div>
+        <div class="bookmark-hover-icon">
+          <span class="material-symbols-outlined pointer">
+            bookmark
+          </span>
+        </div>
+        <div class="align-center">
           <span class="material-symbols-outlined pointer" (click)="delete(item.id)">
             delete
+          </span>
+        </div>
+        <div class="align-center">
+          <span class="material-symbols-outlined pointer">
+            visibility
           </span>
         </div>
       </div>
@@ -13,19 +23,33 @@
       <div class="title">
         <div class="form-group">
           <div class="input-group">
-            @if(item){
-            <span class="material-symbols-outlined align-center drag" style="cursor: grab; opacity: 0.4">
-              drag_indicator
-            </span>
-            }
-            <input type="text" class="form-control" placeholder="Title" formControlName="title" (focus)="enableEditMode()"
-              (blur)="triggerSaveOperation()" />
+            <ng-content></ng-content>
+            <input type="text" class="form-control" placeholder="Title" formControlName="title" (focus)="enableEditMode()" />
             <div class="input-group-append">
-              @if(titleValue != ''){
-              <span class="input-group-text pointer material-icons" (click)="titleValue = ''">
+              @if(form.get('title')!.value){
+              <span class="input-group-text pointer material-icons x-title" (click)="clearTitle()">
                 close
               </span>
               }
+              <span [matMenuTriggerFor]="bookmarkMenu" class="input-group-text pointer material-icons menu-title">
+                more_vert
+              </span>
+              <mat-menu #bookmarkMenu="matMenu">
+                <button mat-menu-item class="align-center" (click)="enableEditMode()">
+                  <span class="material-symbols-outlined"> border_color </span>
+                  <span>Edit</span>
+                </button>
+
+                <button mat-menu-item class="align-center">
+                  <span class="material-symbols-outlined"> visibility </span>
+                  <span>View</span>
+                </button>
+
+                <button mat-menu-item class="align-center" (click)="delete(item.id)">
+                  <span class="material-symbols-outlined"> delete </span>
+                  <span>Remove</span>
+                </button>
+              </mat-menu>
             </div>
           </div>
         </div>
@@ -38,9 +62,15 @@
               let isLast = last
             " [formGroupName]="i">
             <div class="input-group">
-              <span class="input-group-text material-symbols-outlined left-span">{{ linkFormGroup.get("link")!.value ? "link" : "add" }}</span>
+              <span *ngIf="!linkFormGroup.get('image')?.value" class="input-group-text material-symbols-outlined left-span">{{
+                linkFormGroup.get("link")!.value ? "link" : "add" }}</span>
+              <span class="left-span" *ngIf="linkFormGroup.get('image')?.value">
+                <img height="20px" [src]="linkFormGroup.get('image')?.value" class="link-image" alt="Link preview image">
+              </span>
               <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
-                (focus)="enableEditMode()" (blur)="triggerSaveOperation()" />
+                (focus)="enableEditMode()">
+              <!-- <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
+                (focus)="enableEditMode()" /> -->
               @if(editMode){
               <span class="input-group-text material-symbols-outlined pointer right-span remove-icon"
                 *ngIf="links.length > 1 && !(isLast && linkFormGroup.get('link')!.value.trim() === '')" (click)="removeLink(i)">
@@ -52,10 +82,10 @@
       </div>
       <div class="textarea">
         <textarea #textarea placeholder="Add comments" formControlName="comment" (input)="adjustTextareaHeight($event)" rows="1"
-          (focus)="enableEditMode()" (blur)="triggerSaveOperation()"></textarea>
+          (focus)="enableEditMode(); "></textarea>
         @if(!item || editMode){
         <div class="btn-div">
-          <button (click)="onSubmit()" mat-button class="input-button">
+          <button (click)="!editMode ? onSubmit() : onEditSubmit()" mat-button class="input-button">
             Done
           </button>
         </div>

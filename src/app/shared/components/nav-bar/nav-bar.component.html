@@ -1,17 +1,17 @@
 <div class="main-toolbar">
   <mat-toolbar>
-
     <div class="flex">
       <div class="sales-proposal align-center pointer" routerLink="/home">
         <div class="header align-center">
           <div class="icon">
+
             <img src="/assets/images/logo.svg" width="30px" alt="" />
           </div>
         </div>
       </div>
-      <ng-container *ngIf="item$ | async as item">
-        <div class="title-res align-center">
-          <div class="input-group custom-input-group pointer" routerLink="/home">
+      <ng-container *ngIf="item$ | async as item; else simpleTitle">
+        <div class="title-res align-center" (click)="updateTitle(item.title)">
+          <div class="input-group custom-input-group pointer">
             <p>{{item.title}}</p>
             <div class="input-group-append">
               <span class="input-group-text" id="basic-addon2"><i class="edit-icon fas fa-edit"></i></span>
@@ -19,16 +19,55 @@
           </div>
         </div>
       </ng-container>
+      <ng-template #simpleTitle>
+        <div class="title-res align-center" *ngIf="title" (click)="updateTitle(title)">
+          <div class="input-group custom-input-group pointer">
+            <p>{{title}}</p>
+            <div class="input-group-append">
+              <span class="input-group-text" id="basic-addon2"><i class="edit-icon fas fa-edit"></i></span>
+            </div>
+          </div>
+        </div>
+      </ng-template>
       <div class="profile-side">
         <div class="profile">
           <div class="image">
             <div class="pic pointer">
-              <img src="/assets/images/profile_pic.png" alt="" />
+              <span [matMenuTriggerFor]="navMenu" class="material-symbols-outlined menu-icon pointer">
+                menu
+              </span>
+              <img [matMenuTriggerFor]="navMenu" src="/assets/images/profile_pic.png" class="profile-pic " alt="" />
+              <mat-menu #navMenu="matMenu">
+                <button mat-menu-item class="align-center">
+                  <span class="material-symbols-outlined"> settings </span>
+                  <span>Channel Membership</span>
+                </button>
+
+                <button mat-menu-item class="align-center">
+                  <span class="material-symbols-outlined">
+                    person_add
+                  </span>
+                  <span>Invite Colleagues</span>
+                </button>
+
+                <button mat-menu-item class="align-center">
+                  <span class="material-symbols-outlined">
+                    playlist_add_check
+                  </span>
+                  <span>My Channels</span>
+                </button>
+
+                <button mat-menu-item class="align-center">
+                  <span class="material-symbols-outlined">
+                    logout
+                  </span>
+                  <span>Sign out</span>
+                </button>
+              </mat-menu>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </mat-toolbar>
 </div>

@@ -2,9 +2,15 @@
 <div class="main" #mainContainer>
   <div cdkDropList #bookmarkList="cdkDropList" [cdkDropListData]="items" [cdkDropListConnectedTo]="[notebookList, chatList]" class="bookmark-list"
     (cdkDropListDropped)="drop($event)">
-    <div *ngFor="let item of items$ | async; let i = index" class="bookmark-item mt-4" cdkDrag>
+    <div *ngFor="let item of items$ | async; let i = index" cdkDrag class="bookmark-item mt-4">
       <div>
-        <app-bookmark-input [item]="item" (scrollRequest)="scrollMainContainerToBottom()"></app-bookmark-input>
+        <app-bookmark-input [item]="item" (scrollRequest)="scrollMainContainerToBottom()">
+          <div cdkDragHandle>
+            <span class="material-symbols-outlined align-center drag" style="cursor: grab; opacity: 0.4">
+              drag_indicator
+            </span>
+          </div>
+        </app-bookmark-input>
       </div>
     </div>
   </div>
@@ -15,9 +21,18 @@
     </div>
   </div>
 
-  <div cdkDropList #chatList="cdkDropList" [cdkDropListData]="chatSessions" [cdkDropListConnectedTo]="[bookmarkList, notebookList]" class="chat-list"
-    (cdkDropListDropped)="drop($event)">
+  <div #chatContainer cdkDropList #chatList="cdkDropList" [cdkDropListData]="chatSessions" [cdkDropListConnectedTo]="[bookmarkList, notebookList]"
+    class="chat-list" (cdkDropListDropped)="drop($event)">
     <div *ngFor="let chatSession of chatSessions$ | async; let sessionIndex = index" class="chat-session" cdkDrag>
+      <div class="hover-icons">
+        <div class="main">
+          <div>
+            <span class="material-symbols-outlined pointer" (click)="delete(chatSession.id)">
+              delete
+            </span>
+          </div>
+        </div>
+      </div>
       <div class="messages mt-3">
         <div class="flex-messages">
           <div *ngFor="let message of chatSession.messages"
@@ -51,43 +66,38 @@
       </div>
     </div>
   </div>
-  <div [class.hidden]="!showInput && !showButtons" class="btns-main justify-center gap-15" *ngIf="!showInput && showButtons">
+  <div class="btns-main justify-center gap-15">
     <div class="btns">
-      <div class="web-bookmark-btn">
-        <button mat-icon-button matTooltip="Add Web Bookmarks" matTooltipPosition="above" (click)="addNewBookmark()">
-          <span class="material-symbols-outlined bookmark-icon"> bookmark </span>
+      <div class="web-bookmark-btn align-center ">
+        <button class="flex" matTooltip="Add Web Bookmarks" matTooltipPosition="above" (click)="addNewBookmark()">
+          <span class="material-symbols-outlined bookmark-icon flex"> bookmark </span>
         </button>
       </div>
-      <div class="notes-btn">
-        <button mat-icon-button matTooltip="Add Notes" matTooltipPosition="above" (click)="addNewNotebook()">
-          <span class="material-symbols-outlined notes-icon"> add_notes </span>
+      <div class="notes-btn align-center ">
+        <button class="flex" matTooltip="Add Notes" matTooltipPosition="above" (click)="addNewNotebook()">
+          <span class="material-symbols-outlined notes-icon flex"> add_notes </span>
         </button>
       </div>
-    </div>
-    <div class="chat-btn">
-      <button mat-icon-button matTooltip="New Chat" matTooltipPosition="above" (click)="toggleChat()">
-        <img src="/assets/icons/ai.svg" alt="">
-      </button>
-    </div>
-    <div class="menu-btn">
-      <button mat-icon-button matTooltip="More items" matTooltipPosition="above">
-        <span class="material-symbols-outlined menu-icon"> more_vert </span>
-      </button>
+
+      <div class="chat-btn align-center ">
+        <button class="flex" matTooltip="New Chat" matTooltipPosition="above" (click)="toggleChat()">
+          <img src="/assets/icons/ai.svg" class="flex" alt="">
+        </button>
+      </div>
+      <div class="menu-btn align-center ">
+        <button matTooltip="More items" matTooltipPosition="above" class="flex">
+          <span class="material-symbols-outlined menu-icon flex"> more_vert </span>
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
 <div *ngIf="showInput" class="chat-input">
-  <div class="">
-    <mat-form-field appearance="fill" class="example-full-width">
-      <mat-label>Type a message</mat-label>
-      <input matInput #chatInput placeholder="Ask me anything..." (keyup.enter)="onSendMessage(chatInput.value); chatInput.value=''">
-    </mat-form-field>
-    <button mat-icon-button matTooltip="Close" (click)="toggleChat()" matSuffix id="x-close">
-      <span class="material-symbols-outlined"> close </span>
-    </button>
-    <div class="send-btn">
-      <button mat-flat-button (click)="onSendMessage(chatInput.value)">Send</button>
-    </div>
-  </div>
+  <mat-form-field appearance="outline">
+    <input matInput #chatInput placeholder="Ask me anything..." (keyup.enter)="onSendMessage(chatInput.value); chatInput.value=''">
+    <mat-icon matSuffix (click)="onSendMessage(chatInput.value)"><span class="material-symbols-outlined pointer">
+        send
+      </span></mat-icon>
+  </mat-form-field>
 </div>

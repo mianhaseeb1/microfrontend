@@ -6,7 +6,7 @@
   z-index: 999;
   mat-toolbar {
     background: white;
-    box-shadow: 0 0 6px #ccc;
+    box-shadow: 0 1px 3px 0px #00000026;
     height: 53px !important;
     .flex {
       width: 100%;
@@ -71,4 +71,17 @@
 
 .custom-input-group:hover .edit-icon {
   visibility: visible;
+}
+
+.menu-icon {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .menu-icon {
+    display: block;
+  }
+  .profile-pic {
+    display: none;
+  }
 }

@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { HomeMainContentComponent } from '../../components/home-main-content/home-main-content.component';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { NavBarComponent } from '../../../shared/components/nav-bar/nav-bar.component';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { EditNotebookComponent } from '../../dialogs/edit-notebook/edit-notebook.component';
 import { Store } from '@ngrx/store';
 import { loadPages } from '../../../store/actions/pages.actions';
+import { SharedService } from '../../../services/shared.service';
 
 @Component({
   selector: 'app-home',
@@ -26,7 +27,12 @@ import { loadPages } from '../../../store/actions/pages.actions';
 })
 export class HomeComponent {
   selectedValue!: string;
-  constructor(public dialog: MatDialog, private store: Store) {}
+  constructor(
+    public dialog: MatDialog,
+    private store: Store,
+    private router: Router,
+    private sharedService: SharedService
+  ) {}
 
   addNotebook(): void {
     const dialogRef = this.dialog.open(EditNotebookComponent, {
@@ -34,7 +40,10 @@ export class HomeComponent {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      this.store.dispatch(loadPages({ userId: 1 }));
+      if (result) {
+        this.store.dispatch(loadPages({ userId: 1 }));
+        this.router.navigate(['/main'], { queryParams: { title: result } });
+      }
     });
   }
 }
