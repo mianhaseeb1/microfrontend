@@ -24,7 +24,7 @@ export class EditNotebookComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.notebookName = this.data.title;
+    this.notebookName = this.data?.title;
   }
 
   save(): void {
