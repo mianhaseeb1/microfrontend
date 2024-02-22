@@ -40,6 +40,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { PagesData } from '../../../models/pages-cards.model';
 import { SharedService } from '../../../services/shared.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Tool } from '../../../enums/tools.enum';
 @Component({
   selector: 'app-main',
   standalone: true,
@@ -82,6 +83,8 @@ export class MainComponent implements OnInit, OnDestroy {
   lastScrollTop: number = 0;
   editingContentBot: string = '';
   private lastDeletedSession: ChatSession | null = null;
+  currentTool: Tool | null = null;
+  isMain!: boolean;
 
   constructor(
     private bookmarkService: BookmarkService,
@@ -94,7 +97,7 @@ export class MainComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.scrollMainContainerToBottom();
+    this.isMain = true;
     this.store.dispatch(BookmarkActions.loadBookmarks());
     this.items$ = this.store.select(fromBookmark.selectAllBookmarks);
     this.store.dispatch(NotebookActions.loadNotes());
@@ -207,6 +210,11 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   toggleChat() {
+    if (this.currentTool && this.currentTool !== Tool.CHAT) {
+      this.sharedService.triggerSubmit(this.currentTool);
+    }
+    this.currentTool = Tool.CHAT;
+
     this.showInput = !this.showInput;
     this.scrollToBottom();
     if (this.showInput) {
@@ -224,6 +232,7 @@ export class MainComponent implements OnInit, OnDestroy {
           .querySelector('.chat-input mat-form-field')!
           .classList.add('active');
       }, 10);
+      this.sharedService.triggerSubmit(Tool.CHAT);
     } else {
       document
         .querySelector('.chat-input mat-form-field')!
@@ -241,7 +250,11 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   addNewBookmark(): void {
-    this.scrollMainContainerToBottom();
+    if (this.currentTool && this.currentTool !== Tool.BOOKMARK) {
+      this.sharedService.triggerSubmit(this.currentTool);
+    }
+    this.currentTool = Tool.BOOKMARK;
+    this.showInput = false;
     this.addingNewBookmark = true;
     const newBookmark: Bookmark = {
       id: this.generateUniqueId(),
@@ -252,6 +265,7 @@ export class MainComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(BookmarkActions.addBookmark({ bookmark: newBookmark }));
     this.onBookmarkAdded(newBookmark.id);
+    this.sharedService.triggerSubmit(Tool.BOOKMARK);
   }
 
   onSendMessage(content: string) {
@@ -290,16 +304,21 @@ export class MainComponent implements OnInit, OnDestroy {
   }
 
   addNewNotebook(): void {
-    this.scrollMainContainerToBottom();
+    if (this.currentTool && this.currentTool !== Tool.NOTE) {
+      this.sharedService.triggerSubmit(this.currentTool);
+    }
+    this.currentTool = Tool.NOTE;
+    this.showInput = false;
     const newNotebook: Notebook = {
       id: '',
       content: '',
     };
     this.store.dispatch(NotebookActions.addNotes({ note: newNotebook }));
+
+    this.sharedService.triggerSubmit(Tool.NOTE);
   }
 
   onBookmarkAdded(newBookmarkId: string) {
-    this.scrollMainContainerToBottom();
     this.addingNewBookmark = false;
     const newBookmark = this.items.find(
       (bookmark) => bookmark.id === newBookmarkId
@@ -317,20 +336,6 @@ export class MainComponent implements OnInit, OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
-
-  scrollToTop() {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  }
-
-  // scrollToBottom() {
-  //   window.scrollTo({
-  //     top: document.body.scrollHeight,
-  //     behavior: 'smooth',
-  //   });
-  // }
 
   sanitizeHTML(htmlContent: string) {
     return this.sanitizer.bypassSecurityTrustHtml(htmlContent);
@@ -359,25 +364,6 @@ export class MainComponent implements OnInit, OnDestroy {
     this.editingContent = message.content;
     this.editingContentBot = message.content;
   }
-
-  // finishEditing(message: ChatMessage, newContent: string): void {
-  //   if (newContent !== this.originalContent) {
-  //     const botMessageId = this.getBotMessageIdForUserMessage(message.id);
-  //     this.store.dispatch(
-  //       ChatActions.editMessage({
-  //         sessionId: this.currentSessionId,
-  //         userMessageId: message.id,
-  //         botMessageId: botMessageId,
-  //         newContent,
-  //         isEdit: true,
-  //       })
-  //     );
-  //   }
-
-  //   this.editingMessage = null;
-  //   this.originalContent = '';
-  //   this.editingContent = '';
-  // }
 
   onContentChange() {
     const textarea: HTMLTextAreaElement = this.autosize.nativeElement;

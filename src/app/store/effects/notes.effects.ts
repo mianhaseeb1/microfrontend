@@ -26,22 +26,24 @@ export class NotebookEffects {
       ofType(NotebookActions.addNotes),
       mergeMap((action) =>
         of(this.notebookService.addNotebook(action.note)).pipe(
-          map((note) => NotebookActions.addEmptyNotes({ note })),
+          map((note) => NotebookActions.noteAddedSuccessfully({ note })),
           catchError((error) =>
-            of({ type: '[Notebook] Add Notebook Failed', error })
+            of({ type: '[Notebook] Adding Notebook Failed', error })
           )
         )
       )
     )
   );
-
   updateNotebook$ = createEffect(() =>
     this.actions$.pipe(
       ofType(NotebookActions.updateNotes),
-      tap((action) => this.notebookService.updateNotebook(action.note)),
-      map(() => NotebookActions.loadNotes()),
-      catchError((error) =>
-        of({ type: '[Notebook] Update Notebook Failed', error })
+      mergeMap((action) =>
+        this.notebookService.updateNotebook(action.note).pipe(
+          map(() => NotebookActions.loadNotes()),
+          catchError((error) =>
+            of({ type: '[Notebook] Update Notebook Failed', error })
+          )
+        )
       )
     )
   );

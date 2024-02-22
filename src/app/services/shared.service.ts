@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { PagesData } from '../models/pages-cards.model';
 
 @Injectable({
@@ -11,6 +11,13 @@ export class SharedService {
 
   currentData = this.dataSource.asObservable();
   currentTitle = this.titleSource.asObservable();
+
+  private submitSubject = new Subject<string>();
+  submitAction$ = this.submitSubject.asObservable();
+
+  triggerSubmit(action: string) {
+    this.submitSubject.next(action);
+  }
 
   updateData(data: PagesData | null) {
     this.dataSource.next(data);

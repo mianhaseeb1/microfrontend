@@ -1,4 +1,11 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { SharedModule } from '../../../shared/shared.module';
 import { CommonModule } from '@angular/common';
 import InlineEditor from '@ckeditor/ckeditor5-build-inline';
@@ -8,9 +15,32 @@ import { EditorService } from '../../../services/ckeditor.service';
 import { Notebook } from '../../../models/notebook.model';
 import { Store } from '@ngrx/store';
 import * as NotebookActions from '../../../store/actions/notes.actions';
-import { Subject, debounceTime } from 'rxjs';
+import { Subject, Subscription, debounceTime } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { SharedService } from '../../../services/shared.service';
+import { Tool } from '../../../enums/tools.enum';
+
+class UploadAdapter {
+  private loader;
+  constructor(loader: any) {
+    this.loader = loader;
+  }
+
+  upload() {
+    return this.loader.file.then(
+      (file: any) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve({ default: reader.result });
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        })
+    );
+  }
+}
 @Component({
   selector: 'app-notes',
   standalone: true,
@@ -18,59 +48,59 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './notes.component.html',
   styleUrl: './notes.component.scss',
 })
-export class NotesComponent {
-  editorContent: string = '';
-  @ViewChild('editor', { static: true }) editorRef!: ElementRef;
-  @ViewChild('editorContainer', { static: true })
-  editorContainerRef!: ElementRef;
+export class NotesComponent implements OnInit, OnDestroy {
   public editorInstance: any;
   @Input() notebook!: Notebook;
   private contentChange = new Subject<string>();
   lastDeletedNote: Notebook | null = null;
+  private subscription!: Subscription;
+  editor = InlineEditor;
+  data: any = ``;
+  private blurSubject = new Subject<string>();
+  private subscriptions = new Subscription();
 
   constructor(
     private editorService: EditorService,
     private store: Store,
     public dialog: MatDialog,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private sharedService: SharedService
   ) {
-    this.contentChange.pipe(debounceTime(1000)).subscribe((content) => {
-      this.saveNotebookContent(content);
-    });
+    // this.contentChange.pipe(debounceTime(1000)).subscribe((content) => {
+    //   this.saveNotebookContent(content);
+    // });
   }
 
   ngOnInit(): void {
-    InlineEditor.create(this.editorRef.nativeElement)
-      .then((editor: any) => {
-        this.editorInstance = editor;
+    this.data = this.notebook.content;
 
-        if (this.notebook && this.notebook.content) {
-          this.editorInstance.setData(this.notebook.content);
-        }
+    this.subscription = this.sharedService.submitAction$.subscribe((action) => {
+      if (action === Tool.NOTE) {
+        this.save();
+      }
+    });
 
-        this.editorInstance.model.document.on('change:data', () => {
-          const content = this.editorInstance.getData();
-          this.contentChange.next(content);
-        });
-
-        this.editorInstance.editing.view.document.on('blur', () => {
-          const content = this.editorInstance.getData();
-          if (content.trim() !== '') {
-            this.saveNotebookContent(content);
-          }
-        });
+    this.subscriptions.add(
+      this.blurSubject.pipe(debounceTime(5000)).subscribe((content) => {
+        this.saveNotebookContent(content);
       })
-      .catch((error: any) => {
-        console.error('Error occurred in CKEditor: ', error);
-      });
+    );
   }
 
-  saveOnBlur() {
-    if (this.editorInstance && this.editorHasContent()) {
-      const content = this.editorInstance.getData();
-      console.log('Saving content on blur:', content);
-      this.saveNotebookContent(content);
-    }
+  onEditorChange({ editor }: { editor: any }): void {
+    this.data = editor.getData();
+  }
+
+  onEditorBlur(): void {
+    this.blurSubject.next(this.data);
+  }
+
+  onReady(eventData: any) {
+    eventData.plugins.get('FileRepository').createUploadAdapter = function (
+      loader: any
+    ) {
+      return new UploadAdapter(loader);
+    };
   }
 
   private saveNotebookContent(content: string) {
@@ -78,9 +108,8 @@ export class NotesComponent {
     this.store.dispatch(NotebookActions.updateNotes({ note: updatedNotebook }));
   }
 
-  editorHasContent(): boolean {
-    const content = this.editorInstance.getData();
-    return content.trim() !== '';
+  save() {
+    this.editorService.addEditorContent(this.data);
   }
 
   delete(id: string) {
@@ -108,15 +137,7 @@ export class NotesComponent {
     });
   }
 
-  save() {
-    const content = this.editorInstance.getData();
-    this.editorService.addEditorContent(content);
-  }
-
   ngOnDestroy(): void {
-    if (this.editorInstance) {
-      this.editorInstance.destroy();
-      this.contentChange.unsubscribe();
-    }
+    this.subscriptions.unsubscribe();
   }
 }

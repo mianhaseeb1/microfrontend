@@ -1,6 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { Bookmark } from '../models/bookmark.model';
-import { Observable, Subject, of } from 'rxjs';
+import { Observable, Subject, catchError, map, of } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -56,4 +56,39 @@ export class BookmarkService {
       }&q=${encodeURIComponent(url)}`
     );
   }
+
+  fetchLinkData(url: string): Observable<any> {
+    return this.http.get(url, { responseType: 'text' }).pipe(
+      map((data) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data, 'text/html');
+        const title = doc.querySelector('title')?.innerText || '';
+        const link = url;
+        const description =
+          doc
+            .querySelector('meta[name="description"]')
+            ?.getAttribute('content') || '';
+        const image =
+          doc
+            .querySelector('meta[property="og:image"]')
+            ?.getAttribute('content') || '';
+        return { title, description, image, link };
+      }),
+      catchError((error) => {
+        console.error('Error fetching link preview:', error);
+        return of(null);
+      })
+    );
+  }
+
+  // addBookmark(data: { pageId: number }): Observable<Bookmark> {
+  //   return this.http.post<Bookmark>(`${environment.bookmarksApi}`, data);
+  // }
+
+  // updateBookmark(id: string, changes: Partial<Bookmark>): Observable<Bookmark> {
+  //   return this.http.patch<Bookmark>(
+  //     `${environment.bookmarksApi}/${id}`,
+  //     changes
+  //   );
+  // }
 }

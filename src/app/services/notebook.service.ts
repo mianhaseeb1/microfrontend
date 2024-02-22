@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { Notebook } from '../models/notebook.model';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -30,12 +30,17 @@ export class NotebookService {
     return newNotebook;
   }
 
-  updateNotebook(notebook: Notebook) {
+  updateNotebook(notebook: Notebook): Observable<Notebook> {
     const index = this.dataStore.notebooks.findIndex(
       (n) => n.id === notebook.id
     );
-    this.dataStore.notebooks[index] = notebook;
-    this.notebooksSubject.next(Object.assign({}, this.dataStore).notebooks);
+    if (index !== -1) {
+      this.dataStore.notebooks[index] = notebook;
+      this.notebooksSubject.next(Object.assign({}, this.dataStore).notebooks);
+      return of(notebook);
+    } else {
+      return throwError(() => new Error('Notebook not found'));
+    }
   }
 
   deleteNotebook(id: string) {
