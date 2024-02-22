@@ -72,7 +72,7 @@ export class NotesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.data = this.notebook.content;
+    //this.data = this.notebook.content;
 
     this.subscription = this.sharedService.submitAction$.subscribe((action) => {
       if (action === Tool.NOTE) {
@@ -91,9 +91,9 @@ export class NotesComponent implements OnInit, OnDestroy {
     this.data = editor.getData();
   }
 
-  onEditorBlur(): void {
-    this.blurSubject.next(this.data);
-  }
+  // onEditorBlur(): void {
+  //   this.blurSubject.next(this.data);
+  // }
 
   onReady(eventData: any) {
     eventData.plugins.get('FileRepository').createUploadAdapter = function (
