@@ -7,6 +7,7 @@ export interface Bookmark {
 }
 
 export interface BookmarkLink {
+  url: string;
   link: string;
   image?: string;
 }

@@ -43,9 +43,8 @@
 
       <ng-template #noItem>
         <div class="title-res align-center">
-          <div class="input-group custom-input-group pointer">
-            <!-- Display an empty input field if item$ is empty -->
-            <input type="text" class="form-control" placeholder="Enter title" [(ngModel)]="newTitle" (keyup.enter)="updateTitle(newTitle)">
+          <div class="input-group custom-input-group pointer" (click)="updateTitle(newTitle)">
+            <input type="text" class="form-control" placeholder="Enter title" [(ngModel)]="newTitle" >
             <div class="input-group-append">
               <span class="input-group-text" id="basic-addon2"><i class="edit-icon fas fa-edit"></i></span>
             </div>

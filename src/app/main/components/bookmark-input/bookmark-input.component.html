@@ -69,7 +69,7 @@
               <span class="left-span" *ngIf="linkFormGroup.get('image')?.value">
                 <img height="20px" [src]="linkFormGroup.get('image')?.value" class="link-image" alt="Link preview image">
               </span>
-              <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
+              <input (click)="redirectToUrl(linkFormGroup.get('url')!.value)" type="text" class="form-control pointer" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
                 (focus)="enableEditMode()">
               <!-- <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
                 (focus)="enableEditMode()" /> -->

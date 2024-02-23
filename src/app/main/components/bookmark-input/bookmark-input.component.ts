@@ -98,6 +98,7 @@ export class BookmarkInputComponent
         this.fb.group({
           link: [link.link, Validators.required],
           image: [link.image],
+          url: [link.url]
         })
       );
       const linksFormArray = this.fb.array(linksFormGroups);
@@ -152,6 +153,7 @@ export class BookmarkInputComponent
       .links!.map((linkObj: any) => ({
         link: linkObj.link.trim(),
         image: linkObj.image || '',
+        url: linkObj.url || ''
       }))
       .filter((linkObj: any) => linkObj.link !== '');
 
@@ -181,6 +183,7 @@ export class BookmarkInputComponent
       .links!.map((linkObj: any) => ({
         link: linkObj.link.trim(),
         image: linkObj.image || '',
+        url: linkObj.url || ''
       }))
       .filter((linkObj: any) => linkObj.link !== '');
 
@@ -212,7 +215,7 @@ export class BookmarkInputComponent
 
   initializeLinks(links: BookmarkLink[]): void {
     const linkFormGroups = links.map((item) =>
-      this.fb.group({ link: item.link, image: item.image })
+      this.fb.group({ link: item.link, image: item.image, url: item.url })
     );
     this.form.setControl('links', this.fb.array(linkFormGroups));
   }
@@ -256,6 +259,7 @@ export class BookmarkInputComponent
       .links!.map((linkObj: any) => ({
         link: linkObj.link.trim(),
         image: linkObj.image || '',
+        url: linkObj.url || ''
       }))
       .filter((linkObj: any) => linkObj.link !== '');
 
@@ -317,6 +321,8 @@ export class BookmarkInputComponent
     if (url) {
       this.bookmarkService.getLinkPreview(url).subscribe({
         next: (data) => {
+          console.log(data);
+          
           if (data) {
             if (data.image) {
               linkFormGroup.get('image')?.patchValue(data.image);
@@ -325,6 +331,7 @@ export class BookmarkInputComponent
             linkFormGroup.patchValue({
               link: data.title,
               image: data.image,
+              url: data.url
             });
             this.cdr.detectChanges();
           }
@@ -335,6 +342,14 @@ export class BookmarkInputComponent
 
     if (index === this.links.length - 1 && url) {
       this.addLink();
+    }
+  }
+
+  redirectToUrl(url: string): void {
+   console.log(url);
+   
+    if (url) {
+      window.open(url, '_blank');
     }
   }
 
@@ -366,6 +381,7 @@ export class BookmarkInputComponent
     return this.fb.group({
       link: ['', Validators.required],
       image: [''],
+      url: ['']
     });
   }
 
