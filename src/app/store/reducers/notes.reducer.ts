@@ -22,7 +22,7 @@ export const notesReducer = createReducer(
     return {
       ...state,
       notes: [...state.notes, { id: '', content: '' }],
-      isAddingNewNotebook: true,
+      isAddingNewNotes: true,
     };
   }),
   on(NotebookActions.addNotes, (state, { note }) => {
@@ -30,6 +30,7 @@ export const notesReducer = createReducer(
     return {
       ...state,
       notes: [...state.notes, newNotebook],
+      isAddingNewNotes: false,
     };
   }),
   on(NotebookActions.updateNotes, (state, { note }) => ({

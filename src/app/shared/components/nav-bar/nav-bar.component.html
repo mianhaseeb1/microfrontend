@@ -9,7 +9,8 @@
           </div>
         </div>
       </div>
-      <ng-container *ngIf="item$ | async as item; else simpleTitle">
+      @if(isMain){
+      <!-- <ng-container *ngIf="item$ | async as item; else simpleTitle">
         <div class="title-res align-center" (click)="updateTitle(item.title)">
           <div class="input-group custom-input-group pointer">
             <p>{{item.title}}</p>
@@ -28,7 +29,29 @@
             </div>
           </div>
         </div>
+      </ng-template> -->
+      <ng-container *ngIf="item$ | async as item; else noItem">
+        <div class="title-res align-center" (click)="updateTitle(item.title)">
+          <div class="input-group custom-input-group pointer">
+            <p>{{ item.title }}</p>
+            <div class="input-group-append">
+              <span class="input-group-text" id="basic-addon2"><i class="edit-icon fas fa-edit"></i></span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #noItem>
+        <div class="title-res align-center">
+          <div class="input-group custom-input-group pointer" (click)="updateTitle(newTitle)">
+            <input type="text" class="form-control" placeholder="Enter title" [(ngModel)]="newTitle" >
+            <div class="input-group-append">
+              <span class="input-group-text" id="basic-addon2"><i class="edit-icon fas fa-edit"></i></span>
+            </div>
+          </div>
+        </div>
       </ng-template>
+      }
       <div class="profile-side">
         <div class="profile">
           <div class="image">

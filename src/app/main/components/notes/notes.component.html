@@ -1,16 +1,28 @@
 <div class="flex-notes">
   <div class="hover-icons">
     <div class="main">
-      <div>
+      <div class="bookmark-hover-icon">
+        <span class="material-symbols-outlined pointer">
+          overview
+        </span>
+      </div>
+      <ng-content></ng-content>
+      <div class="align-center">
         <span class="material-symbols-outlined pointer" (click)="delete(notebook.id)">
           delete
+        </span>
+      </div>
+      <div class="align-center">
+        <span class="material-symbols-outlined pointer">
+          visibility
         </span>
       </div>
     </div>
   </div>
   <div class="main-notes">
-    <div #editorContainer class="content">
-      <div #editor class="editor"></div>
+    <div class="content">
+      <ckeditor [editor]="editor" [(ngModel)]="data" (ready)="onReady($event)" id="ckeditor">
+      </ckeditor>
     </div>
   </div>
 </div>

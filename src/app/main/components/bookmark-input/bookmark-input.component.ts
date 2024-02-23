@@ -5,6 +5,7 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   QueryList,
@@ -22,8 +23,10 @@ import { MESSAGE } from '../../../utils/MESSAGES';
 import { Store } from '@ngrx/store';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import { v4 as uuidv4 } from 'uuid';
-import { Subject, debounceTime } from 'rxjs';
+import { Subject, Subscription, debounceTime } from 'rxjs';
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
+import { SharedService } from '../../../services/shared.service';
+import { Tool } from '../../../enums/tools.enum';
 
 @Component({
   selector: 'app-bookmark-input',
@@ -32,7 +35,9 @@ import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
   templateUrl: './bookmark-input.component.html',
   styleUrl: './bookmark-input.component.scss',
 })
-export class BookmarkInputComponent implements OnInit, AfterViewInit {
+export class BookmarkInputComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   titleValue: string = '';
   inputValue: string = '';
   editMode: boolean = false;
@@ -44,6 +49,8 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   @Input() item!: Bookmark;
   @Output() bookmarkAdded = new EventEmitter<string>();
   private saveSubject = new Subject<void>();
+  private subscription!: Subscription;
+  isInputFocused!: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -51,7 +58,8 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     private bookmarkService: BookmarkService,
     private cdr: ChangeDetectorRef,
     private _snackBar: MatSnackBar,
-    private store: Store
+    private store: Store,
+    private sharedService: SharedService
   ) {
     this.form = this.fb.group({
       title: ['', Validators.required],
@@ -90,6 +98,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
         this.fb.group({
           link: [link.link, Validators.required],
           image: [link.image],
+          url: [link.url]
         })
       );
       const linksFormArray = this.fb.array(linksFormGroups);
@@ -108,8 +117,14 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       this.initializeLinks(this.item.links);
     }
 
-    this.saveSubject.pipe(debounceTime(3000)).subscribe(() => {
-      this.onEditSubmit();
+    // this.saveSubject.pipe(debounceTime(3000)).subscribe(() => {
+    //   this.onEditSubmit();
+    // });
+
+    this.subscription = this.sharedService.submitAction$.subscribe((action) => {
+      if (action === Tool.BOOKMARK) {
+        this.onSubmit();
+      }
     });
 
     this.bookmarkService.notebookTitle$.subscribe((update) => {
@@ -138,6 +153,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       .links!.map((linkObj: any) => ({
         link: linkObj.link.trim(),
         image: linkObj.image || '',
+        url: linkObj.url || ''
       }))
       .filter((linkObj: any) => linkObj.link !== '');
 
@@ -167,6 +183,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       .links!.map((linkObj: any) => ({
         link: linkObj.link.trim(),
         image: linkObj.image || '',
+        url: linkObj.url || ''
       }))
       .filter((linkObj: any) => linkObj.link !== '');
 
@@ -198,7 +215,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
 
   initializeLinks(links: BookmarkLink[]): void {
     const linkFormGroups = links.map((item) =>
-      this.fb.group({ link: item.link, image: item.image })
+      this.fb.group({ link: item.link, image: item.image, url: item.url })
     );
     this.form.setControl('links', this.fb.array(linkFormGroups));
   }
@@ -215,13 +232,10 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   }
 
   enableEditMode(): void {
+    this.isInputFocused = true;
     if (!this.editMode) {
       this.editMode = true;
-      const lastLink = this.links.at(this.links.length - 1).value.link.trim();
-
-      if (lastLink !== '') {
-        this.addLink();
-      }
+      this.addLink();
 
       this.cdr.detectChanges();
     }
@@ -245,6 +259,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       .links!.map((linkObj: any) => ({
         link: linkObj.link.trim(),
         image: linkObj.image || '',
+        url: linkObj.url || ''
       }))
       .filter((linkObj: any) => linkObj.link !== '');
 
@@ -285,7 +300,6 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
   }
 
   addLink(): void {
-    this.requestScroll();
     this.links.push(this.createLink());
   }
 
@@ -307,6 +321,8 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     if (url) {
       this.bookmarkService.getLinkPreview(url).subscribe({
         next: (data) => {
+          console.log(data);
+          
           if (data) {
             if (data.image) {
               linkFormGroup.get('image')?.patchValue(data.image);
@@ -315,6 +331,7 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
             linkFormGroup.patchValue({
               link: data.title,
               image: data.image,
+              url: data.url
             });
             this.cdr.detectChanges();
           }
@@ -328,10 +345,43 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
     }
   }
 
+  redirectToUrl(url: string): void {
+   console.log(url);
+   
+    if (url) {
+      window.open(url, '_blank');
+    }
+  }
+
+  // onInput(index: number): void {
+  //   const linkFormGroup = this.links.at(index) as FormGroup;
+  //   const url = linkFormGroup.get('link')!.value.trim();
+  //   if (url) {
+  //     this.bookmarkService.fetchLinkData(url).subscribe({
+  //       next: (data) => {
+  //         if (data) {
+  //           linkFormGroup.patchValue({
+  //             title: data.title,
+  //             image: data.image,
+  //             link: data.link,
+  //           });
+  //           this.cdr.detectChanges();
+  //         }
+  //       },
+  //       error: (error) => console.error('Error:', error),
+  //     });
+  //   }
+
+  //   if (index === this.links.length - 1 && url) {
+  //     this.addLink();
+  //   }
+  // }
+
   createLink(): FormGroup {
     return this.fb.group({
       link: ['', Validators.required],
       image: [''],
+      url: ['']
     });
   }
 
@@ -360,5 +410,9 @@ export class BookmarkInputComponent implements OnInit, AfterViewInit {
       this.lastDeletedItem = null;
     });
     this.requestScroll();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

@@ -27,3 +27,8 @@ export const addEmptyNotes = createAction(
   '[Notes] Add Empty Notes',
   props<{ note: Notebook }>()
 );
+
+export const noteAddedSuccessfully = createAction(
+  '[Notes] Note Added Successfully',
+  props<{ note: Notebook }>()
+);

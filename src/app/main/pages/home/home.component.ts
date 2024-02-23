@@ -46,4 +46,11 @@ export class HomeComponent {
       }
     });
   }
+
+  toMain() {
+    this.sharedService.updateTitle(null);
+    this.sharedService.updateData(null);
+
+    this.router.navigate(['/main']);
+  }
 }

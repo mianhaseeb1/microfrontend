@@ -5,6 +5,9 @@
         position: absolute;
         top: 40px;
         left: 40px;
+        @media (max-width: 600px) {
+          left: 48%;
+        }
       }
     }
   }

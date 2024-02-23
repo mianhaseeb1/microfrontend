@@ -7,6 +7,7 @@
             bookmark
           </span>
         </div>
+        <ng-content></ng-content>
         <div class="align-center">
           <span class="material-symbols-outlined pointer" (click)="delete(item.id)">
             delete
@@ -23,10 +24,11 @@
       <div class="title">
         <div class="form-group">
           <div class="input-group">
-            <ng-content></ng-content>
-            <input type="text" class="form-control" placeholder="Title" formControlName="title" (focus)="enableEditMode()" />
+
+            <input type="text" class="form-control" placeholder="Title" formControlName="title" (focus)="enableEditMode()"
+              (blur)="isInputFocused = false" />
             <div class="input-group-append">
-              @if(form.get('title')!.value){
+              @if(form.get('title')!.value && isInputFocused){
               <span class="input-group-text pointer material-icons x-title" (click)="clearTitle()">
                 close
               </span>
@@ -67,7 +69,7 @@
               <span class="left-span" *ngIf="linkFormGroup.get('image')?.value">
                 <img height="20px" [src]="linkFormGroup.get('image')?.value" class="link-image" alt="Link preview image">
               </span>
-              <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
+              <input (click)="redirectToUrl(linkFormGroup.get('url')!.value)" type="text" class="form-control pointer" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
                 (focus)="enableEditMode()">
               <!-- <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
                 (focus)="enableEditMode()" /> -->

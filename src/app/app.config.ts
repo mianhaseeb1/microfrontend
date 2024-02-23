@@ -11,6 +11,7 @@ import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { ChatEffects } from './store/effects/chat.effects';
 import { AuthEffects } from './store/effects/auth.effects';
 import { PageEffects } from './store/effects/pages.effects';
+import { NotebookEffects } from './store/effects/notes.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,7 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideHttpClient(),
     provideStore(reducers, { metaReducers }),
-    provideEffects([ChatEffects, AuthEffects, PageEffects]),
+    provideEffects([ChatEffects, AuthEffects, PageEffects, NotebookEffects]),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: !isDevMode(),

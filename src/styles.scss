@@ -186,10 +186,6 @@ mat-expansion-panel {
   display: none !important;
 }
 
-.edit-mode {
-  background-color: lightblue;
-}
-
-.editor p {
-  min-height: 120px !important;
+#ckeditor p {
+  min-height: 195px !important;
 }

@@ -35,6 +35,8 @@ export class HomeMainContentComponent implements OnInit {
 
   selectNotebook(item: PagesData) {
     this.sharedService.updateData(item);
-    this.router.navigate(['/main'], { queryParams: { title: item.title } });
+    this.router.navigate(['/main'], {
+      queryParams: { title: item.title, id: item.id },
+    });
   }
 }
