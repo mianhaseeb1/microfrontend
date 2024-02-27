@@ -21,8 +21,6 @@ import { NavBarComponent } from '../../../shared/components/nav-bar/nav-bar.comp
 import { BookmarkService } from '../../../services/bookmark.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { EditorService } from '../../../services/ckeditor.service';
-import InlineEditor from '@ckeditor/ckeditor5-build-inline';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { Observable, Subject, take, takeUntil } from 'rxjs';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import * as NotebookActions from '../../../store/actions/notes.actions';
@@ -52,7 +50,6 @@ import { Tool } from '../../../enums/tools.enum';
     BookmarkInputComponent,
     NavBarComponent,
     RouterModule,
-    CKEditorModule,
     NotesComponent,
   ],
   templateUrl: './main.component.html',
@@ -63,7 +60,6 @@ export class MainComponent implements OnInit, OnDestroy {
   items: Bookmark[] = [];
   items$!: Observable<Bookmark[]>;
   editorContents: string[] = [];
-  EditorType = InlineEditor;
   private unsubscribe$ = new Subject<void>();
   addingNewBookmark: boolean = false;
   notebooks: Notebook[] = [];
