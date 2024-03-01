@@ -12,6 +12,7 @@ import { ChatEffects } from './store/effects/chat.effects';
 import { AuthEffects } from './store/effects/auth.effects';
 import { PageEffects } from './store/effects/pages.effects';
 import { NotebookEffects } from './store/effects/notes.effects';
+import { BookmarkEffects } from './store/effects/bookmark.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideHttpClient(),
     provideStore(reducers, { metaReducers }),
-    provideEffects([ChatEffects, AuthEffects, PageEffects, NotebookEffects]),
+    provideEffects([ChatEffects, AuthEffects, PageEffects, NotebookEffects, BookmarkEffects]),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: !isDevMode(),

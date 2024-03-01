@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { Bookmark } from '../models/bookmark.model';
+import { Bookmark, BookmarkDTO } from '../models/bookmark.model';
 import { Observable, Subject, catchError, map, of } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { HttpClient } from '@angular/common/http';
@@ -25,28 +25,12 @@ export class BookmarkService {
     return of(this.bookmarks);
   }
 
-  addBookmark(bookmark: Bookmark): Observable<Bookmark> {
-    if (!bookmark?.id) {
-      bookmark.id = uuidv4();
-    }
-    this.bookmarks.push(bookmark);
-    return of(bookmark);
+  addBookmark(bookmark: BookmarkDTO): Observable<BookmarkDTO> {
+    return this.http.post<BookmarkDTO>(environment.bookmarksApi, bookmark);
   }
 
-  deleteBookmark(id: string): Observable<any> {
-    this.bookmarks = this.bookmarks.filter((bookmark) => bookmark.id !== id);
-    this.onBookmarkDeleted.emit();
-    return of({ success: true });
-  }
-
-  updateBookmark(bookmark: Bookmark): Observable<any> {
-    const index = this.bookmarks.findIndex((b) => b.id === bookmark.id);
-    if (index !== -1) {
-      this.bookmarks[index] = bookmark;
-      return of({ success: true, message: 'Bookmark updated successfully.' });
-    } else {
-      return of({ success: false, message: 'Bookmark not found.' });
-    }
+  updateBookmark(bookmarkId: number | undefined, data: BookmarkDTO): Observable<any> {
+    return this.http.patch(`${environment.bookmarksApi}/${bookmarkId}`, data);
   }
 
   getLinkPreview(url: string): Observable<any> {

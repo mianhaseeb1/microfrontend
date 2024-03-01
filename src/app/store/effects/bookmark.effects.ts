@@ -22,18 +22,29 @@ export class BookmarkEffects {
   );
 
   updateBookmark$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(BookmarkActions.updateBookmark),
-      mergeMap((action) =>
-        this.bookmarkService.updateBookmark(action.bookmark).pipe(
-          map(() => {
-            return BookmarkActions.loadBookmarks();
-          }),
-          catchError(() => of({ type: '[Bookmark] Update Bookmark Failed' }))
-        )
+  this.actions$.pipe(
+    ofType(BookmarkActions.updateBookmark),
+    mergeMap((action) =>
+      this.bookmarkService.updateBookmark(action.bookmarkId, action.data).pipe(
+        map((bookmark) => BookmarkActions.updateBookmarkSuccess({ bookmark })),
+        catchError((error) => of(BookmarkActions.updateBookmarkFailure({ error })))
       )
     )
-  );
+  )
+);
+
+
+  addBookmark$ = createEffect(() =>
+  this.actions$.pipe(
+    ofType(BookmarkActions.addBookmark),
+    mergeMap((action) =>
+      this.bookmarkService.addBookmark(action.bookmark).pipe(
+        map((bookmark) => BookmarkActions.bookmarkAdded({ bookmark })),
+        catchError((error) => of(BookmarkActions.addBookmarkFailed({ error })))
+      )
+    )
+  )
+);
 
   refreshBookmarks$ = createEffect(() =>
     this.actions$.pipe(

@@ -1,9 +1,9 @@
 import { createReducer, on } from '@ngrx/store';
-import { Bookmark } from '../../models/bookmark.model';
+import { Bookmark, BookmarkDTO } from '../../models/bookmark.model';
 import * as BookmarkActions from '../actions/bookmark.actions';
 
 export interface BookmarkState {
-  bookmarks: Bookmark[];
+  bookmarks: BookmarkDTO[];
   isAddingNewBookmark: boolean;
 }
 
@@ -14,44 +14,41 @@ export const initialState: BookmarkState = {
 
 export const bookmarkReducer = createReducer(
   initialState,
-  on(BookmarkActions.deleteBookmark, (state, { id }) => ({
+  on(BookmarkActions.addEmptyBookmark, (state) => ({
     ...state,
-    bookmarks: state.bookmarks.filter((bookmark) => bookmark.id !== id),
+    bookmarks: [
+      ...state.bookmarks,
+      { pageId: 0, title: '', comment: '', links: [{url: '', link: ''}] }, 
+    ],
+    isAddingNewBookmark: true,
   })),
-  on(BookmarkActions.bookmarksLoaded, (state, { bookmarks }) => ({
+  on(BookmarkActions.bookmarkAdded, (state, { bookmark }) => ({
     ...state,
-    bookmarks,
+    bookmarks: [...state.bookmarks, bookmark],
+    isAddingNewBookmark: false,
   })),
-  on(BookmarkActions.updateBookmark, (state, { bookmark }) => ({
+  on(BookmarkActions.addBookmarkFailed, (state, { error }) => ({
     ...state,
-    bookmarks: state.bookmarks.map((b) =>
-      b.id === bookmark.id ? bookmark : b
-    ),
+    error: error,
+    isAddingNewBookmark: false,
   })),
-  on(BookmarkActions.addEmptyBookmark, (state) => {
-    if (state.isAddingNewBookmark) {
-      return state;
-    }
-    return {
-      ...state,
-      bookmarks: [
-        ...state.bookmarks,
-        { id: '', title: '', comment: '', links: [] },
-      ],
-      isAddingNewBookmark: true,
-    };
-  }),
-  on(BookmarkActions.addBookmark, (state, { bookmark }) => {
-    if (bookmark.id) {
-      return {
-        ...state,
-        bookmarks: [...state.bookmarks, bookmark],
-      };
-    }
-    return state;
-  }),
-  on(BookmarkActions.updateBookmarksOrder, (state, { bookmarks }) => ({
+  on(BookmarkActions.updateBookmark, (state) => ({
     ...state,
-    bookmarks: bookmarks,
+    isLoading: true,
+    error: null,
+  })),
+  on(BookmarkActions.updateBookmarkSuccess, (state, { bookmark }) => ({
+    ...state,
+    bookmarks: state.bookmarks.map((b) => (b.id === bookmark.id ? { ...b, ...bookmark } : b)),
+    isLoading: false,
+  })),
+  on(BookmarkActions.updateBookmarkFailure, (state, { error }) => ({
+    ...state,
+    isLoading: false,
+    error,
+  })),
+  on(BookmarkActions.removeEmptyBookmarks, (state) => ({
+    ...state,
+    bookmarks: state.bookmarks.filter(bookmark => bookmark.title.trim() !== '' || bookmark.comment.trim() !== '' || bookmark.links.length > 0),
   }))
 );
