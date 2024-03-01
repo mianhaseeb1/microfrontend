@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, map, of, throwError } from 'rxjs';
 import { Notebook } from '../models/notebook.model';
 import { v4 as uuidv4 } from 'uuid';
+import { environment } from '../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +12,7 @@ export class NotebookService {
   private notebooksSubject: BehaviorSubject<Notebook[]>;
   private dataStore: { notebooks: Notebook[] };
 
-  constructor() {
+  constructor(private http: HttpClient) {
     this.dataStore = { notebooks: [] };
     this.notebooksSubject = new BehaviorSubject<Notebook[]>([]);
   }
@@ -41,6 +43,12 @@ export class NotebookService {
     } else {
       return throwError(() => new Error('Notebook not found'));
     }
+  }
+
+  getNotesByPageId(pageId: string): Observable<Notebook[]> {
+    return this.http
+      .get<{ notes: Notebook[] }>(`${environment.pagesCards}${pageId}`)
+      .pipe(map((response) => response.notes));
   }
 
   deleteNotebook(id: string) {

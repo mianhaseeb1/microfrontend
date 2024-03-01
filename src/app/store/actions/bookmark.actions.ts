@@ -29,3 +29,8 @@ export const updateBookmarksOrder = createAction(
   '[Bookmark] Update Bookmarks Order',
   props<{ bookmarks: Bookmark[] }>()
 );
+
+export const loadBookmarksByPageId = createAction(
+  '[Bookmark] Load Bookmarks By PageId',
+  props<{ pageId: string }>()
+);

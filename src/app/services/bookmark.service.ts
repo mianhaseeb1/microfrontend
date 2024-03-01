@@ -57,6 +57,12 @@ export class BookmarkService {
     );
   }
 
+  getBookmarksByPageId(pageId: string): Observable<Bookmark[]> {
+    return this.http
+      .get<{ bookmarks: Bookmark[] }>(`${environment.pagesCards}${pageId}`)
+      .pipe(map((response) => response.bookmarks));
+  }
+
   fetchLinkData(url: string): Observable<any> {
     return this.http.get(url, { responseType: 'text' }).pipe(
       map((data) => {
