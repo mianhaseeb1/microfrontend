@@ -106,6 +106,14 @@ export class MainComponent implements OnInit, OnDestroy {
       });
 
     this.activatedRoute.queryParams.subscribe((params) => {
+      const pageId = params['id'];
+      if (pageId) {
+        this.store.dispatch(BookmarkActions.loadBookmarksByPageId({ pageId }));
+        this.store.dispatch(NotebookActions.loadNotesByPageId({ pageId }));
+      }
+    });
+
+    this.activatedRoute.queryParams.subscribe((params) => {
       const title = params['title'];
       if (title) {
         this.sharedService.updateTitle(title);

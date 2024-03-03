@@ -20,7 +20,13 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideHttpClient(),
     provideStore(reducers, { metaReducers }),
-    provideEffects([ChatEffects, AuthEffects, PageEffects, NotebookEffects, BookmarkEffects]),
+    provideEffects([
+      ChatEffects,
+      AuthEffects,
+      PageEffects,
+      NotebookEffects,
+      BookmarkEffects,
+    ]),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: !isDevMode(),

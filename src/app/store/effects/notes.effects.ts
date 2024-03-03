@@ -7,6 +7,18 @@ import { NotebookService } from '../../services/notebook.service';
 
 @Injectable()
 export class NotebookEffects {
+  loadNotesByPageId$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(NotebookActions.loadNotesByPageId),
+      mergeMap((action) =>
+        this.notebookService.getNotesByPageId(action.pageId).pipe(
+          map((notes) => NotebookActions.notesLoaded({ notes })),
+          catchError(() => of({ type: '[Notes] Load Notes Failed' }))
+        )
+      )
+    )
+  );
+
   loadNotebooks$ = createEffect(() =>
     this.actions$.pipe(
       ofType(NotebookActions.loadNotes),

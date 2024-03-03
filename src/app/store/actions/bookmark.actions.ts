@@ -20,6 +20,11 @@ export const updateBookmarksOrder = createAction(
   props<{ bookmarks: Bookmark[] }>()
 );
 
+export const loadBookmarksByPageId = createAction(
+  '[Bookmark] Load Bookmarks By PageId',
+  props<{ pageId: string }>()
+);
+
 export const addBookmark = createAction(
   '[Bookmark] Add Bookmark',
   props<{ bookmark: BookmarkDTO }>()
@@ -50,4 +55,6 @@ export const updateBookmarkFailure = createAction(
   props<{ error: any }>()
 );
 
-export const removeEmptyBookmarks = createAction('[Bookmark] Remove Empty Bookmarks');
+export const removeEmptyBookmarks = createAction(
+  '[Bookmark] Remove Empty Bookmarks'
+);

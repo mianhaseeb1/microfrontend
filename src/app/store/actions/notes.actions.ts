@@ -32,3 +32,8 @@ export const noteAddedSuccessfully = createAction(
   '[Notes] Note Added Successfully',
   props<{ note: Notebook }>()
 );
+
+export const loadNotesByPageId = createAction(
+  '[Notes] Load Notes By PageId',
+  props<{ pageId: string }>()
+);

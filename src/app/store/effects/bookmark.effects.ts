@@ -7,6 +7,18 @@ import * as BookmarkActions from '../actions/bookmark.actions';
 
 @Injectable()
 export class BookmarkEffects {
+  loadBookmarksByPageId$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(BookmarkActions.loadBookmarksByPageId),
+      mergeMap((action) =>
+        this.bookmarkService.getBookmarksByPageId(action.pageId).pipe(
+          map((bookmarks) => BookmarkActions.bookmarksLoaded({ bookmarks })),
+          catchError(() => of({ type: '[Bookmark] Load Bookmarks Failed' }))
+        )
+      )
+    )
+  );
+
   loadBookmarks$ = createEffect(() =>
     this.actions$.pipe(
       ofType(BookmarkActions.loadBookmarks),
