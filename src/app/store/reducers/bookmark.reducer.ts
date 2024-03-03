@@ -18,7 +18,7 @@ export const bookmarkReducer = createReducer(
     ...state,
     bookmarks: [
       ...state.bookmarks,
-      { pageId: 0, title: '', comment: '', links: [{url: '', link: ''}] }, 
+      { pageId: 0, title: '', comment: '', links: [{ url: '', link: '' }] },
     ],
     isAddingNewBookmark: true,
   })),
@@ -39,7 +39,9 @@ export const bookmarkReducer = createReducer(
   })),
   on(BookmarkActions.updateBookmarkSuccess, (state, { bookmark }) => ({
     ...state,
-    bookmarks: state.bookmarks.map((b) => (b.id === bookmark.id ? { ...b, ...bookmark } : b)),
+    bookmarks: state.bookmarks.map((b) =>
+      b.id === bookmark.id ? { ...b, ...bookmark } : b
+    ),
     isLoading: false,
   })),
   on(BookmarkActions.updateBookmarkFailure, (state, { error }) => ({
@@ -49,6 +51,15 @@ export const bookmarkReducer = createReducer(
   })),
   on(BookmarkActions.removeEmptyBookmarks, (state) => ({
     ...state,
-    bookmarks: state.bookmarks.filter(bookmark => bookmark.title.trim() !== '' || bookmark.comment.trim() !== '' || bookmark.links.length > 0),
+    bookmarks: state.bookmarks.filter(
+      (bookmark) =>
+        !(
+          bookmark.title.trim() === '' &&
+          bookmark.comment.trim() === '' &&
+          bookmark.links.every(
+            (link) => link.url.trim() === '' && link.link.trim() === ''
+          )
+        )
+    ),
   }))
 );
