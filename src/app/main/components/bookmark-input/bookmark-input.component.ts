@@ -16,7 +16,7 @@ import { SharedModule } from '../../../shared/shared.module';
 import { CommonModule } from '@angular/common';
 import { EditNotebookComponent } from '../../dialogs/edit-notebook/edit-notebook.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Bookmark, BookmarkLink } from '../../../models/bookmark.model';
+import { Bookmark, BookmarkDTO, BookmarkLink, BookmarkLinkDTO } from '../../../models/bookmark.model';
 import { BookmarkService } from '../../../services/bookmark.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MESSAGE } from '../../../utils/MESSAGES';
@@ -27,6 +27,7 @@ import { Subject, Subscription, debounceTime } from 'rxjs';
 import { CdkDrag, CdkDropList } from '@angular/cdk/drag-drop';
 import { SharedService } from '../../../services/shared.service';
 import { Tool } from '../../../enums/tools.enum';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-bookmark-input',
@@ -46,11 +47,12 @@ export class BookmarkInputComponent
   form: FormGroup;
   @Output() scrollRequest = new EventEmitter<void>();
   @ViewChildren('textarea') textareas!: QueryList<ElementRef>;
-  @Input() item!: Bookmark;
+  @Input() item!: BookmarkDTO;
   @Output() bookmarkAdded = new EventEmitter<string>();
   private saveSubject = new Subject<void>();
   private subscription!: Subscription;
   isInputFocused!: boolean;
+  pageId: number = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -59,7 +61,8 @@ export class BookmarkInputComponent
     private cdr: ChangeDetectorRef,
     private _snackBar: MatSnackBar,
     private store: Store,
-    private sharedService: SharedService
+    private sharedService: SharedService,
+    private route: ActivatedRoute
   ) {
     this.form = this.fb.group({
       title: ['', Validators.required],
@@ -85,7 +88,8 @@ export class BookmarkInputComponent
   }
 
   ngOnInit(): void {
-    if (!this.item || !this.item.id) {
+    if (!this.item) {
+
       this.enableEditMode();
       this.addLink();
     } else {
@@ -97,17 +101,22 @@ export class BookmarkInputComponent
       const linksFormGroups = this.item.links.map((link) =>
         this.fb.group({
           link: [link.link, Validators.required],
-          image: [link.image],
-          url: [link.url]
+          title: [link.url]
         })
       );
       const linksFormArray = this.fb.array(linksFormGroups);
       this.form.setControl('links', linksFormArray);
 
-      if (this.item.editMode && this.item.title == '') {
-        this.enableEditMode();
-      }
+      // if (this.item.editMode && this.item.title == '') {
+      //   this.enableEditMode();
+      // }
     }
+
+    this.route.queryParams.subscribe(params => {
+      const id = params['id'];
+      this.pageId = id;
+
+    });
 
     if (this.item) {
       this.form.patchValue({
@@ -117,21 +126,17 @@ export class BookmarkInputComponent
       this.initializeLinks(this.item.links);
     }
 
-    // this.saveSubject.pipe(debounceTime(3000)).subscribe(() => {
-    //   this.onEditSubmit();
-    // });
-
     this.subscription = this.sharedService.submitAction$.subscribe((action) => {
       if (action === Tool.BOOKMARK) {
         this.onSubmit();
       }
     });
 
-    this.bookmarkService.notebookTitle$.subscribe((update) => {
-      if (update.id === this.item.id) {
-        this.form.controls['title'].setValue(update.newTitle);
-      }
-    });
+    // this.bookmarkService.notebookTitle$.subscribe((update) => {
+    //   if (update.id == this.item.id) {
+    //     this.form.controls['title'].setValue(update.newTitle);
+    //   }
+    // });
   }
 
   ngAfterViewInit(): void {
@@ -148,29 +153,21 @@ export class BookmarkInputComponent
 
   onEditSubmit() {
     const formValue = this.form.value;
-
+    const bookmarkId = this.item.id;
     const linksObjects = formValue
       .links!.map((linkObj: any) => ({
         link: linkObj.link.trim(),
-        image: linkObj.image || '',
-        url: linkObj.url || ''
+        title: linkObj.url || ''
       }))
       .filter((linkObj: any) => linkObj.link !== '');
 
-    console.log(linksObjects);
-
-    const isNewBookmark = !this.item || !this.item.id;
-
-    const bookmark: Bookmark = {
-      id: isNewBookmark ? this.generateUniqueId() : this.item.id,
-      title: formValue.title || '',
-      comment: formValue.comment || '',
-      links: linksObjects || [],
+    const updateData = {
+      title: this.form.value.title,
+      comment: this.form.value.comment,
+      links: linksObjects
     };
-
-    console.log(bookmark);
-
-    this.store.dispatch(BookmarkActions.updateBookmark({ bookmark }));
+  
+    this.store.dispatch(BookmarkActions.updateBookmark({ bookmarkId, data: updateData }));
 
     this.editMode = false;
     this.addingNewBookmark = false;
@@ -182,58 +179,58 @@ export class BookmarkInputComponent
     const linksObjects = formValue
       .links!.map((linkObj: any) => ({
         link: linkObj.link.trim(),
-        image: linkObj.image || '',
-        url: linkObj.url || ''
+        title: linkObj.url || ''
       }))
       .filter((linkObj: any) => linkObj.link !== '');
 
-    console.log(linksObjects);
 
-    const isNewBookmark = !this.item || !this.item.id;
-
-    const bookmark: Bookmark = {
-      id: isNewBookmark ? this.generateUniqueId() : this.item.id,
+    const bookmark: BookmarkDTO = {
+      pageId: this.pageId,
       title: formValue.title || '',
       comment: formValue.comment || '',
       links: linksObjects || [],
     };
 
-    if (isNewBookmark) {
       this.store.dispatch(BookmarkActions.addBookmark({ bookmark }));
-      this.bookmarkAdded.emit(bookmark.id);
+
       this.form.reset();
       this.editMode = false;
       this.addingNewBookmark = false;
-      this._snackBar.open(MESSAGE.successfully_added_bookmark);
-    } else {
-      this.store.dispatch(BookmarkActions.updateBookmark({ bookmark }));
-      this._snackBar.open(MESSAGE.successfully_updated_bookmark);
-    }
-
+     this.store.dispatch(BookmarkActions.removeEmptyBookmarks());
+     this.store.dispatch(BookmarkActions.loadBookmarks());
     this.requestScroll();
   }
 
-  initializeLinks(links: BookmarkLink[]): void {
+  saveBookmark(): void {
+    console.log(this.editMode);
+    
+    if (this.editMode) {
+        this.onEditSubmit();
+    } else {
+        this.onSubmit();
+    }
+}
+
+  initializeLinks(links: BookmarkLinkDTO[]): void {
     const linkFormGroups = links.map((item) =>
-      this.fb.group({ link: item.link, image: item.image, url: item.url })
+      this.fb.group({ link: item.link, title: item.url })
     );
     this.form.setControl('links', this.fb.array(linkFormGroups));
   }
 
   initializeForm(): void {
     this.form = this.fb.group({
+      pageId: [''],
       title: [''],
       comment: [''],
       links: this.fb.array([this.createLink()]),
     });
   }
-  private generateUniqueId(): string {
-    return uuidv4();
-  }
 
   enableEditMode(): void {
     this.isInputFocused = true;
-    if (!this.editMode) {
+    
+    if (!this.editMode && !this.isLastLinkEmpty()) {
       this.editMode = true;
       this.addLink();
 
@@ -251,9 +248,16 @@ export class BookmarkInputComponent
     }
   }
 
+  isLastLinkEmpty(): boolean {
+    const lastLinkFormGroup = this.links.at(this.links.length - 1) as FormGroup;
+    const lastUrl = lastLinkFormGroup.get('link')!.value.trim();
+    return !lastUrl;
+}
+
   disableEditMode(): void {
     const formValue = this.form.value;
     const linkInputs = formValue.links || [];
+    const bookmarkId = this.item.id;
 
     const linksObjects = formValue
       .links!.map((linkObj: any) => ({
@@ -263,7 +267,7 @@ export class BookmarkInputComponent
       }))
       .filter((linkObj: any) => linkObj.link !== '');
 
-    const updatedBookmark: Bookmark = {
+    const updatedBookmark: BookmarkDTO = {
       ...this.item,
       title: formValue.title || '',
       comment: formValue.comment || '',
@@ -272,9 +276,8 @@ export class BookmarkInputComponent
     };
 
     this.store.dispatch(
-      BookmarkActions.updateBookmark({ bookmark: updatedBookmark })
+      BookmarkActions.updateBookmark({bookmarkId, data: updatedBookmark })
     );
-    this._snackBar.open(MESSAGE.successfully_updated_bookmark);
     this.requestScroll();
     this.editMode = false;
     this.cdr.detectChanges();
@@ -330,8 +333,7 @@ export class BookmarkInputComponent
 
             linkFormGroup.patchValue({
               link: data.title,
-              image: data.image,
-              url: data.url
+              title: data.url
             });
             this.cdr.detectChanges();
           }
@@ -345,72 +347,39 @@ export class BookmarkInputComponent
     }
   }
 
-  redirectToUrl(url: string): void {
-   console.log(url);
-   
-    if (url) {
-      window.open(url, '_blank');
-    }
-  }
-
-  // onInput(index: number): void {
-  //   const linkFormGroup = this.links.at(index) as FormGroup;
-  //   const url = linkFormGroup.get('link')!.value.trim();
-  //   if (url) {
-  //     this.bookmarkService.fetchLinkData(url).subscribe({
-  //       next: (data) => {
-  //         if (data) {
-  //           linkFormGroup.patchValue({
-  //             title: data.title,
-  //             image: data.image,
-  //             link: data.link,
-  //           });
-  //           this.cdr.detectChanges();
-  //         }
-  //       },
-  //       error: (error) => console.error('Error:', error),
-  //     });
-  //   }
-
-  //   if (index === this.links.length - 1 && url) {
-  //     this.addLink();
-  //   }
-  // }
-
   createLink(): FormGroup {
     return this.fb.group({
       link: ['', Validators.required],
-      image: [''],
-      url: ['']
+      title: ['']
     });
   }
 
-  delete(id: string) {
-    this.lastDeletedItem = this.item;
-    this.store.dispatch(BookmarkActions.deleteBookmark({ id }));
-    this.showUndoSnackbar();
-    this.requestScroll();
-  }
+  // delete(id: string) {
+  //   this.lastDeletedItem = this.item;
+  //   this.store.dispatch(BookmarkActions.deleteBookmark({ id }));
+  //   this.showUndoSnackbar();
+  //   this.requestScroll();
+  // }
 
-  private showUndoSnackbar() {
-    const snackBarRef = this._snackBar.open('Bookmark deleted', 'UNDO', {
-      duration: 5000,
-    });
+  // private showUndoSnackbar() {
+  //   const snackBarRef = this._snackBar.open('Bookmark deleted', 'UNDO', {
+  //     duration: 5000,
+  //   });
 
-    snackBarRef.onAction().subscribe(() => {
-      if (this.lastDeletedItem) {
-        this.store.dispatch(
-          BookmarkActions.addBookmark({ bookmark: this.lastDeletedItem })
-        );
-        this.lastDeletedItem = null;
-      }
-    });
+  //   snackBarRef.onAction().subscribe(() => {
+  //     if (this.lastDeletedItem) {
+  //       this.store.dispatch(
+  //         BookmarkActions.addBookmark({ bookmark: this.lastDeletedItem })
+  //       );
+  //       this.lastDeletedItem = null;
+  //     }
+  //   });
 
-    snackBarRef.afterDismissed().subscribe(() => {
-      this.lastDeletedItem = null;
-    });
-    this.requestScroll();
-  }
+  //   snackBarRef.afterDismissed().subscribe(() => {
+  //     this.lastDeletedItem = null;
+  //   });
+  //   this.requestScroll();
+  // }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
