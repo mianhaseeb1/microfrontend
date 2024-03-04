@@ -6,7 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Bookmark } from '../../../models/bookmark.model';
+import { Bookmark, BookmarkDTO } from '../../../models/bookmark.model';
 import {
   CdkDragDrop,
   CdkDropList,
@@ -21,8 +21,6 @@ import { NavBarComponent } from '../../../shared/components/nav-bar/nav-bar.comp
 import { BookmarkService } from '../../../services/bookmark.service';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { EditorService } from '../../../services/ckeditor.service';
-import InlineEditor from '@ckeditor/ckeditor5-build-inline';
-import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { Observable, Subject, take, takeUntil } from 'rxjs';
 import * as BookmarkActions from '../../../store/actions/bookmark.actions';
 import * as NotebookActions from '../../../store/actions/notes.actions';
@@ -52,7 +50,6 @@ import { Tool } from '../../../enums/tools.enum';
     BookmarkInputComponent,
     NavBarComponent,
     RouterModule,
-    CKEditorModule,
     NotesComponent,
   ],
   templateUrl: './main.component.html',
@@ -61,9 +58,8 @@ import { Tool } from '../../../enums/tools.enum';
 export class MainComponent implements OnInit, OnDestroy {
   @ViewChild('autosize') autosize!: ElementRef;
   items: Bookmark[] = [];
-  items$!: Observable<Bookmark[]>;
+  items$!: Observable<BookmarkDTO[]>;
   editorContents: string[] = [];
-  EditorType = InlineEditor;
   private unsubscribe$ = new Subject<void>();
   addingNewBookmark: boolean = false;
   notebooks: Notebook[] = [];
@@ -110,6 +106,14 @@ export class MainComponent implements OnInit, OnDestroy {
       });
 
     this.activatedRoute.queryParams.subscribe((params) => {
+      const pageId = params['id'];
+      if (pageId) {
+        this.store.dispatch(BookmarkActions.loadBookmarksByPageId({ pageId }));
+        this.store.dispatch(NotebookActions.loadNotesByPageId({ pageId }));
+      }
+    });
+
+    this.activatedRoute.queryParams.subscribe((params) => {
       const title = params['title'];
       if (title) {
         this.sharedService.updateTitle(title);
@@ -127,17 +131,6 @@ export class MainComponent implements OnInit, OnDestroy {
         this.refreshBookmarks();
       });
 
-    this.items$.subscribe((items) => {
-      this.items = items || [];
-    });
-
-    this.notebooks$.subscribe((notebooks) => {
-      this.notebooks = notebooks || [];
-    });
-
-    this.chatSessions$.subscribe((sessions) => {
-      this.chatSessions = sessions || [];
-    });
   }
 
   private scrollToBottom(): void {
@@ -256,15 +249,8 @@ export class MainComponent implements OnInit, OnDestroy {
     this.currentTool = Tool.BOOKMARK;
     this.showInput = false;
     this.addingNewBookmark = true;
-    const newBookmark: Bookmark = {
-      id: this.generateUniqueId(),
-      title: '',
-      comment: '',
-      links: [{ link: '', image: '', url: '' }],
-      editMode: true,
-    };
-    this.store.dispatch(BookmarkActions.addBookmark({ bookmark: newBookmark }));
-    this.onBookmarkAdded(newBookmark.id);
+    
+    this.store.dispatch(BookmarkActions.addEmptyBookmark());
     this.sharedService.triggerSubmit(Tool.BOOKMARK);
   }
 
@@ -318,18 +304,14 @@ export class MainComponent implements OnInit, OnDestroy {
     this.sharedService.triggerSubmit(Tool.NOTE);
   }
 
-  onBookmarkAdded(newBookmarkId: string) {
+  onBookmarkAdded(newBookmarkId: number) {
     this.addingNewBookmark = false;
     const newBookmark = this.items.find(
-      (bookmark) => bookmark.id === newBookmarkId
+      (bookmark) => bookmark.id == newBookmarkId
     );
     if (newBookmark) {
       newBookmark.editMode = true;
     }
-  }
-
-  private generateUniqueId(): string {
-    return uuidv4();
   }
 
   ngOnDestroy(): void {
@@ -426,18 +408,5 @@ export class MainComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  @HostListener('window:scroll', [])
-  onWindowScroll(): void {
-    const currentScrollTop =
-      window.pageYOffset ||
-      document.documentElement.scrollTop ||
-      document.body.scrollTop ||
-      0;
-    if (currentScrollTop > this.lastScrollTop) {
-      this.showButtons = true;
-    } else {
-      this.showButtons = false;
-    }
-    this.lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
-  }
+  
 }

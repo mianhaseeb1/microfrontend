@@ -9,7 +9,7 @@
         </div>
         <ng-content></ng-content>
         <div class="align-center">
-          <span class="material-symbols-outlined pointer" (click)="delete(item.id)">
+          <span class="material-symbols-outlined pointer" >
             delete
           </span>
         </div>
@@ -47,7 +47,7 @@
                   <span>View</span>
                 </button>
 
-                <button mat-menu-item class="align-center" (click)="delete(item.id)">
+                <button mat-menu-item class="align-center">
                   <span class="material-symbols-outlined"> delete </span>
                   <span>Remove</span>
                 </button>
@@ -69,7 +69,7 @@
               <span class="left-span" *ngIf="linkFormGroup.get('image')?.value">
                 <img height="20px" [src]="linkFormGroup.get('image')?.value" class="link-image" alt="Link preview image">
               </span>
-              <input (click)="redirectToUrl(linkFormGroup.get('url')!.value)" type="text" class="form-control pointer" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
+              <input type="text" class="form-control pointer" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
                 (focus)="enableEditMode()">
               <!-- <input type="text" class="form-control" formControlName="link" placeholder="Paste link here..." (input)="onInput(i)"
                 (focus)="enableEditMode()" /> -->
@@ -85,13 +85,12 @@
       <div class="textarea">
         <textarea #textarea placeholder="Add comments" formControlName="comment" (input)="adjustTextareaHeight($event)" rows="1"
           (focus)="enableEditMode(); "></textarea>
-        @if(!item || editMode){
+        
         <div class="btn-div">
-          <button (click)="!editMode ? onSubmit() : onEditSubmit()" mat-button class="input-button">
+          <button (click)="saveBookmark()" mat-button class="input-button">
             Done
           </button>
         </div>
-        }
       </div>
     </div>
   </div>

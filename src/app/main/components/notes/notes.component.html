@@ -21,8 +21,7 @@
   </div>
   <div class="main-notes">
     <div class="content">
-      <ckeditor [editor]="editor" [(ngModel)]="data" (ready)="onReady($event)" id="ckeditor">
-      </ckeditor>
+      <editor [apiKey]="tinyApiKey" [init]="editorConfig" [(ngModel)]="data"></editor>
     </div>
   </div>
 </div>
