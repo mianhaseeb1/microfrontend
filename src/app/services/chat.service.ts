@@ -6,9 +6,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ChatService {
-  private OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+  private OPENAI_API_URL = '';
   private headers = new HttpHeaders({
-    Authorization: `Bearer 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`,
+    Authorization: ``,
     'Content-Type': 'application/json',
   });
 
